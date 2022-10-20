@@ -1,6 +1,9 @@
 import os
 import sys
+from copy import deepcopy
 import wafflestate
+import astar
+
 
 sys.setrecursionlimit(10**6)
 
@@ -76,8 +79,7 @@ def switch_chars(waffle, candidate, pos):
                         if waffle.state[m][n][0] == wanted_char:
                             if waffle.state[m][n][1] not in ["g", "m"]:
                                 # switch
-                                (waffle.state[m][n][0], 
-                                 waffle.state[i][j][0],) = (
+                                (waffle.state[m][n][0], waffle.state[i][j][0],) = (
                                     waffle.state[i][j][0],
                                     waffle.state[m][n][0],
                                 )
@@ -153,7 +155,7 @@ def solve(waffle, candidate_list):
                     switchedwaffle = switch_chars(waffle, candidate, pos)
                     if switchedwaffle:
                         waffle.print_state_solved()
-                        # last line attempt successful, start recursion
+                        # last line attempt successful, next recursion level
                         solve(switchedwaffle, candidate_list)
                     if waffle.solved is False:
                         # undo changes after stepping out of failed recursion
@@ -163,7 +165,7 @@ def solve(waffle, candidate_list):
 
 
 # preprocessing not strictly necessary for recursive solution
-# but increases recursion speed 1000x-100000x because current version not very smart
+# but increases recursion speed 1000x-100000x
 def get_candidates(wordlist):
     waffle.print_state()
     candidate_list = {}
@@ -217,7 +219,7 @@ def get_candidates(wordlist):
 
 if __name__ == "__main__":
     # set n to 5 or 7 depending on waffle size
-    n = 7
+    n = 5
     if n == 5:
         initial_state = wafflestate.initial_state_five
     elif n == 7:
@@ -225,6 +227,7 @@ if __name__ == "__main__":
 
     all_chars = set()
     waffle = WaffleNode(n)
+    startstate = deepcopy(initial_state)
 
     cwd = os.getcwd()
     if n == 5:
@@ -244,7 +247,7 @@ if __name__ == "__main__":
         for j in range(n):
             waffle.state[i][j] = initial_state[i][j]
             all_chars.add(initial_state[i][j][0])
-
+    startwaffle = deepcopy(waffle)
     # wordlist preprocessing, keep only words with chars existing in waffle
     print("len wordlist pre filter", len(wordlist_unfiltered))
     for i in range(waffle.n):
@@ -255,7 +258,7 @@ if __name__ == "__main__":
     candidate_list = get_candidates(wordlist)
 
     # uncomment to ignore preprocessing, use raw dictionary, watch number go up
-    '''
+    """
     candidate_list = {}
     for i in range(waffle.n)[0::2]:
         pos = "i" + str(i)
@@ -267,8 +270,25 @@ if __name__ == "__main__":
         print(pos)
         candidates = wordlist_unfiltered
         candidate_list[pos] = candidates
-    '''
+    """
     # go!
     solvedwaffle = solve(waffle, candidate_list)
     print("\n 🧇 🧇 🧇 Sucess! 🧇 🧇 🧇 \n")
     solvedwaffle.print_state_solved()
+
+    astar_start = []
+    astar_end = []
+    # astar_end = [startstate[x][y][0] for x in range(n) for y in range(n)]
+    for x in range(n):
+        startline = []
+        endline = []
+        for y in range(n):
+            startline.append(startstate[x][y][0])
+            endline.append(solvedwaffle.state[x][y][0])
+        astar_start.append(startline)
+        astar_end.append(endline)
+
+    print(astar_start)
+    print(astar_end)
+
+    astar.main(astar_start, astar_end)
