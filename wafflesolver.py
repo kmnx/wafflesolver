@@ -178,24 +178,24 @@ def get_candidates(wordlist):
             colour = state[i][j][1]
             if colour == "g":
                 candidates = [w for w in candidates if w[j] == char]
-                print("candidates after filtering green", candidates)
+                #print("candidates after filtering green", candidates)
             elif colour == "y":
                 # yellow chars not at intersections must be in candidates
                 if j in range(n)[1::2]:
                     candidates = [w for w in candidates if char in w]
                     # but must be excluded at current position
-                    print("candidates after filtering y", candidates)
+                    #print("candidates after filtering y", candidates)
                     candidates = [w for w in candidates if (w[j] != char)]
-                    print("candidates after filtering y at pos", candidates)
+                    #print("candidates after filtering y at pos", candidates)
                 else:
                     # y at intersection might be part of a different word
                     # exclude current position
                     candidates = [w for w in candidates if (w[j] != char)]
-                    print("candidates after filtering y intersect", candidates)
+                    #print("candidates after filtering y intersect", candidates)
             # exclude grey at position
             elif colour == "n":
                 candidates = [w for w in candidates if (w[j] != char)]
-                print("candidates after filtering grey", candidates)
+                #print("candidates after filtering grey", candidates)
         # candidate_list.append([pos, candidates])
         candidate_list[pos] = candidates
     # filter columns
