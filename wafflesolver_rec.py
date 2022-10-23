@@ -4,7 +4,6 @@ from copy import deepcopy
 import wafflestate
 import astar
 
-
 sys.setrecursionlimit(10**6)
 
 
@@ -144,7 +143,7 @@ def solve(waffle, candidate_list):
     for pos in positions:
         # skip further candidates for solved lines
         if line_is_solved(waffle, pos):
-            # if it's the last line waffle must be solved
+            # if it's the last line then whole waffle must be solved
             if pos == positions[-1]:
                 waffle.solved = True
 
@@ -158,7 +157,7 @@ def solve(waffle, candidate_list):
                         # last line attempt successful, next recursion level
                         solve(switchedwaffle, candidate_list)
                     if waffle.solved is False:
-                        # undo changes after stepping out of failed recursion
+                        # undo markings after stepping out of failed recursion
                         unsolve(waffle, pos)
 
             return switchedwaffle
@@ -179,19 +178,24 @@ def get_candidates(wordlist):
             colour = state[i][j][1]
             if colour == "g":
                 candidates = [w for w in candidates if w[j] == char]
+                print('candidates after filtering green', candidates)
             elif colour == "y":
                 # yellow chars not at intersections must be in candidates
                 if j in range(n)[1::2]:
                     candidates = [w for w in candidates if char in w]
-                    # must be excluded at current position
+                    # but must be excluded at current position
+                    print('candidates after filtering y', candidates)
                     candidates = [w for w in candidates if (w[j] != char)]
+                    print('candidates after filtering y at pos', candidates)
                 else:
                     # y at intersection might be part of a different word
                     # exclude current position
                     candidates = [w for w in candidates if (w[j] != char)]
-            # exclude grey
+                    print('candidates after filtering y intersect', candidates)
+            # exclude grey at position
             elif colour == "n":
                 candidates = [w for w in candidates if (w[j] != char)]
+                print('candidates after filtering grey', candidates)
         # candidate_list.append([pos, candidates])
         candidate_list[pos] = candidates
     # filter columns
@@ -219,11 +223,12 @@ def get_candidates(wordlist):
 
 if __name__ == "__main__":
     # set n to 5 or 7 depending on waffle size
-    n = 5
+    n = 7
+
     if n == 5:
-        initial_state = wafflestate.initial_state_five
+        initial_state = wafflestate.initial_state_five_7
     elif n == 7:
-        initial_state = wafflestate.initial_state_seven
+        initial_state = wafflestate.initial_state_seven_2
 
     all_chars = set()
     waffle = WaffleNode(n)
@@ -278,17 +283,23 @@ if __name__ == "__main__":
 
     astar_start = []
     astar_end = []
-    # astar_end = [startstate[x][y][0] for x in range(n) for y in range(n)]
+    inline = ''
+    outline = ''
     for x in range(n):
         startline = []
         endline = []
         for y in range(n):
             startline.append(startstate[x][y][0])
             endline.append(solvedwaffle.state[x][y][0])
+            inline= inline + startstate[x][y][0]
+            outline=outline+solvedwaffle.state[x][y][0]
         astar_start.append(startline)
         astar_end.append(endline)
 
     print(astar_start)
     print(astar_end)
 
-    astar.main(astar_start, astar_end)
+    #astar.main(astar_start, astar_end)
+    astar.main(inline,outline)
+    #print(inline)
+    #print(outline)

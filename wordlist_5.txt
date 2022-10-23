@@ -144,6 +144,7 @@ badly
 bagel
 baggy
 baker
+baked
 baler
 balmy
 banal
