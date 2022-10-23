@@ -196,4 +196,3 @@ initial_state_seven_2 = [
         ["c", "y"],
     ],
 ]
-

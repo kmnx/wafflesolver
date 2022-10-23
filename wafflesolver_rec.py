@@ -154,10 +154,10 @@ def solve(waffle, candidate_list):
                     switchedwaffle = switch_chars(waffle, candidate, pos)
                     if switchedwaffle:
                         waffle.print_state_solved()
-                        # last line attempt successful, next recursion level
+                        # last line attempt successful, start next recursion level
                         solve(switchedwaffle, candidate_list)
                     if waffle.solved is False:
-                        # undo markings after stepping out of failed recursion
+                        # undo solved markers after stepping out of failed recursion
                         unsolve(waffle, pos)
 
             return switchedwaffle
@@ -178,24 +178,24 @@ def get_candidates(wordlist):
             colour = state[i][j][1]
             if colour == "g":
                 candidates = [w for w in candidates if w[j] == char]
-                print('candidates after filtering green', candidates)
+                print("candidates after filtering green", candidates)
             elif colour == "y":
                 # yellow chars not at intersections must be in candidates
                 if j in range(n)[1::2]:
                     candidates = [w for w in candidates if char in w]
                     # but must be excluded at current position
-                    print('candidates after filtering y', candidates)
+                    print("candidates after filtering y", candidates)
                     candidates = [w for w in candidates if (w[j] != char)]
-                    print('candidates after filtering y at pos', candidates)
+                    print("candidates after filtering y at pos", candidates)
                 else:
                     # y at intersection might be part of a different word
                     # exclude current position
                     candidates = [w for w in candidates if (w[j] != char)]
-                    print('candidates after filtering y intersect', candidates)
+                    print("candidates after filtering y intersect", candidates)
             # exclude grey at position
             elif colour == "n":
                 candidates = [w for w in candidates if (w[j] != char)]
-                print('candidates after filtering grey', candidates)
+                print("candidates after filtering grey", candidates)
         # candidate_list.append([pos, candidates])
         candidate_list[pos] = candidates
     # filter columns
@@ -221,19 +221,7 @@ def get_candidates(wordlist):
     return candidate_list
 
 
-if __name__ == "__main__":
-    # set n to 5 or 7 depending on waffle size
-    n = 7
-
-    if n == 5:
-        initial_state = wafflestate.initial_state_five_7
-    elif n == 7:
-        initial_state = wafflestate.initial_state_seven_2
-
-    all_chars = set()
-    waffle = WaffleNode(n)
-    startstate = deepcopy(initial_state)
-
+def prep(waffle, initial_state):
     cwd = os.getcwd()
     if n == 5:
         solutions_file = os.path.join(cwd, "wordlist_5.txt")
@@ -247,13 +235,11 @@ if __name__ == "__main__":
         wordlist_unfiltered = [w.lower() for w in wordlist_unfiltered if len(w) == 7]
         print("len dict", len(wordlist_unfiltered))
 
-    # fill waffle with initial values
     for i in range(n):
         for j in range(n):
             waffle.state[i][j] = initial_state[i][j]
             all_chars.add(initial_state[i][j][0])
-    startwaffle = deepcopy(waffle)
-    # wordlist preprocessing, keep only words with chars existing in waffle
+    # naive wordlist preprocessing, keep only words with chars existing in waffle
     print("len wordlist pre filter", len(wordlist_unfiltered))
     for i in range(waffle.n):
         wordlist = [w for w in wordlist_unfiltered if (w[i] in all_chars)]
@@ -261,9 +247,28 @@ if __name__ == "__main__":
 
     # more preprocessing, per line
     candidate_list = get_candidates(wordlist)
+    return waffle, candidate_list, wordlist_unfiltered
+
+
+if __name__ == "__main__":
+
+    # Set n to 5 or 7 depending on waffle size
+    # wafflestates are in wafflestate.py
+    n = 7
+
+    if n == 5:
+        initial_state = wafflestate.initial_state_five_6
+    elif n == 7:
+        initial_state = wafflestate.initial_state_seven_2
+
+    all_chars = set()
+    waffle = WaffleNode(n)
+    startstate = deepcopy(initial_state)
+
+    waffle, candidate_list, wordlist_unfiltered = prep(waffle, initial_state)
 
     # uncomment to ignore preprocessing, use raw dictionary, watch number go up
-    """
+
     candidate_list = {}
     for i in range(waffle.n)[0::2]:
         pos = "i" + str(i)
@@ -275,31 +280,21 @@ if __name__ == "__main__":
         print(pos)
         candidates = wordlist_unfiltered
         candidate_list[pos] = candidates
-    """
+
     # go!
     solvedwaffle = solve(waffle, candidate_list)
     print("\n 🧇 🧇 🧇 Sucess! 🧇 🧇 🧇 \n")
     solvedwaffle.print_state_solved()
 
-    astar_start = []
-    astar_end = []
-    inline = ''
-    outline = ''
+    astar_start = ""
+    astar_end = ""
     for x in range(n):
         startline = []
         endline = []
         for y in range(n):
-            startline.append(startstate[x][y][0])
-            endline.append(solvedwaffle.state[x][y][0])
-            inline= inline + startstate[x][y][0]
-            outline=outline+solvedwaffle.state[x][y][0]
-        astar_start.append(startline)
-        astar_end.append(endline)
+            astar_start = astar_start + startstate[x][y][0]
+            astar_end = astar_end + solvedwaffle.state[x][y][0]
 
-    print(astar_start)
-    print(astar_end)
-
-    #astar.main(astar_start, astar_end)
-    astar.main(inline,outline)
-    #print(inline)
-    #print(outline)
+    # print(astar_start)
+    # print(astar_end)
+    astar.main(astar_start, astar_end)
