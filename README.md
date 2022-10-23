@@ -1,5 +1,7 @@
 # wafflesolver
 solver for the https://wafflegame.net/ word game
 
-Uses Wordlist preprocessing, bruteforce with recursion to get solution,
-then A*/Astar to find shortest path to solution
+Steps:
+wordlist preprocessing, 
+bruteforce with recursion to get solution,
+A*/Astar to find shortest path to solution
