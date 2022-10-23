@@ -154,7 +154,7 @@ def solve(waffle, candidate_list):
                     switchedwaffle = switch_chars(waffle, candidate, pos)
                     if switchedwaffle:
                         waffle.print_state_solved()
-                        # last line attempt successful, start next recursion level
+                        # last line attempt successful, attempt next line
                         solve(switchedwaffle, candidate_list)
                     if waffle.solved is False:
                         # undo solved markers after stepping out of failed recursion
@@ -239,7 +239,7 @@ def prep(waffle, initial_state):
         for j in range(n):
             waffle.state[i][j] = initial_state[i][j]
             all_chars.add(initial_state[i][j][0])
-    # naive wordlist preprocessing, keep only words with chars existing in waffle
+    # naive wordlist processing, keep only words with chars existing in waffle
     print("len wordlist pre filter", len(wordlist_unfiltered))
     for i in range(waffle.n):
         wordlist = [w for w in wordlist_unfiltered if (w[i] in all_chars)]
@@ -268,7 +268,7 @@ if __name__ == "__main__":
     waffle, candidate_list, wordlist_unfiltered = prep(waffle, initial_state)
 
     # uncomment to ignore preprocessing, use raw dictionary, watch number go up
-
+    '''
     candidate_list = {}
     for i in range(waffle.n)[0::2]:
         pos = "i" + str(i)
@@ -280,7 +280,7 @@ if __name__ == "__main__":
         print(pos)
         candidates = wordlist_unfiltered
         candidate_list[pos] = candidates
-
+    '''
     # go!
     solvedwaffle = solve(waffle, candidate_list)
     print("\n 🧇 🧇 🧇 Sucess! 🧇 🧇 🧇 \n")

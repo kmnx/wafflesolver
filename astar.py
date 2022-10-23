@@ -4,7 +4,6 @@ from warnings import warn
 
 class Node:
     """A node class for A* Pathfinding"""
-
     # not really Astar, more like "guided BFS"
     # h-function seems wrong but works well enough
 
@@ -203,8 +202,6 @@ if __name__ == "__main__":
     outw = "pizzai o ltangoc a nhalve"
     # inw =  'duernr l eimtaee o tdvvee'
     # outw = 'demonr e eutteri a vdelve'
-    # inw =  'uerlimaeeotvve'
-    # outw = 'emoeuteriavelv'
     # inw = 'ondfrd a laoieaf e glgnel'
     # outw = 'odderf o eflinga n alegal'
     # inw = 'henreubq n i tmerluree e q aduuotado o d yieearnc'
