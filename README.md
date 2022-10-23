@@ -6,4 +6,4 @@ wordlist preprocessing,
 bruteforce with recursion to get solution,
 pathfinding to find shortest path to solution
 
-was supposed to be astar, which it isn't quite, but works well enough
+pathfinding algorithm is "not quite astar" but rather "dikstra with guardrails"
