@@ -254,7 +254,7 @@ if __name__ == "__main__":
 
     # Set n to 5 or 7 depending on waffle size
     # wafflestates are in wafflestate.py
-    n = 7
+    n = 5
 
     if n == 5:
         initial_state = wafflestate.initial_state_five_6
@@ -268,7 +268,7 @@ if __name__ == "__main__":
     waffle, candidate_list, wordlist_unfiltered = prep(waffle, initial_state)
 
     # uncomment to ignore preprocessing, use raw dictionary, watch number go up
-
+    '''
     candidate_list = {}
     for i in range(waffle.n)[0::2]:
         pos = "i" + str(i)
@@ -280,7 +280,7 @@ if __name__ == "__main__":
         print(pos)
         candidates = wordlist_unfiltered
         candidate_list[pos] = candidates
-
+    '''
     # go!
     solvedwaffle = solve(waffle, candidate_list)
     print("\n 🧇 🧇 🧇 Sucess! 🧇 🧇 🧇 \n")
