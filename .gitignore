@@ -2,13 +2,6 @@
 .DS_Store
 
 
-# sqlite db
-pythonsqlite.db
-trackids.db
-
-allgif.txt
-mysecrets.py
-
 # Byte-compiled / optimized / DLL files
 
 __pycache__/
