@@ -5,8 +5,8 @@ from warnings import warn
 class Node:
     """A node class for A* Pathfinding"""
 
-    # not sure if really Astar or just BFS on rails
-    # something about distance weight seems wrong, but we move
+    # not really Astar, more like "guided BFS"
+    # h-function seems wrong but works well enough
 
     def __init__(self, parent=None, position=None):
         self.parent = parent
@@ -27,7 +27,7 @@ class Node:
 
 
 def astar(start, end):
-    """Returns a list of steps as a path from the given start to the given end"""
+    """Returns a list of steps as a path from given start to given end"""
 
     # Create start and end node
     node_start = Node(None, start)

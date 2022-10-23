@@ -1,7 +1,7 @@
 # wafflesolver
-solver for the https://wafflegame.net/ word game
+solver for the https://wafflegame.net/ word game to find shortest path
 
 Steps:
 wordlist preprocessing, 
 bruteforce with recursion to get solution,
-A*/Astar to find shortest path to solution
+Weighted BFS to find shortest path to solution

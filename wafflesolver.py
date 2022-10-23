@@ -178,24 +178,24 @@ def get_candidates(wordlist):
             colour = state[i][j][1]
             if colour == "g":
                 candidates = [w for w in candidates if w[j] == char]
-                #print("candidates after filtering green", candidates)
+                # print("candidates after filtering green", candidates)
             elif colour == "y":
                 # yellow chars not at intersections must be in candidates
                 if j in range(n)[1::2]:
                     candidates = [w for w in candidates if char in w]
                     # but must be excluded at current position
-                    #print("candidates after filtering y", candidates)
+                    # print("candidates after filtering y", candidates)
                     candidates = [w for w in candidates if (w[j] != char)]
-                    #print("candidates after filtering y at pos", candidates)
+                    # print("candidates after filtering y at pos", candidates)
                 else:
                     # y at intersection might be part of a different word
                     # exclude current position
                     candidates = [w for w in candidates if (w[j] != char)]
-                    #print("candidates after filtering y intersect", candidates)
+                    # print("candidates after filtering y intersect", candidates)
             # exclude grey at position
             elif colour == "n":
                 candidates = [w for w in candidates if (w[j] != char)]
-                #print("candidates after filtering grey", candidates)
+                # print("candidates after filtering grey", candidates)
         # candidate_list.append([pos, candidates])
         candidate_list[pos] = candidates
     # filter columns
@@ -257,9 +257,9 @@ if __name__ == "__main__":
     n = 5
 
     if n == 5:
-        initial_state = wafflestate.initial_state_five_6
+        initial_state = wafflestate.initial_state_five_8
     elif n == 7:
-        initial_state = wafflestate.initial_state_seven_2
+        initial_state = wafflestate.initial_state_seven_1
 
     all_chars = set()
     waffle = WaffleNode(n)
@@ -268,7 +268,7 @@ if __name__ == "__main__":
     waffle, candidate_list, wordlist_unfiltered = prep(waffle, initial_state)
 
     # uncomment to ignore preprocessing, use raw dictionary, watch number go up
-    '''
+
     candidate_list = {}
     for i in range(waffle.n)[0::2]:
         pos = "i" + str(i)
@@ -280,7 +280,7 @@ if __name__ == "__main__":
         print(pos)
         candidates = wordlist_unfiltered
         candidate_list[pos] = candidates
-    '''
+
     # go!
     solvedwaffle = solve(waffle, candidate_list)
     print("\n 🧇 🧇 🧇 Sucess! 🧇 🧇 🧇 \n")
