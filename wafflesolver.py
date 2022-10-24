@@ -257,7 +257,7 @@ if __name__ == "__main__":
     n = 5
 
     if n == 5:
-        initial_state = wafflestate.initial_state_five_8
+        initial_state = wafflestate.initial_state_five_9
     elif n == 7:
         initial_state = wafflestate.initial_state_seven_1
 
