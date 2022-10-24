@@ -6,4 +6,4 @@ wordlist preprocessing,
 bruteforce with recursion,
 pathfinding shortest path to solution
 
-pathfinding algorithm is "not quite astar" but rather "dijkstra with guardrails"
+pathfinding algorithm is not quite astar but rather "dijkstra with guardrails"
