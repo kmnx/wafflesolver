@@ -1,3 +1,5 @@
+
+
 # waffle # 1
 initial_state_five_1 = [
     [["f", "g"], ["b", "n"], ["o", "n"], ["u", "g"], ["e", "g"]],
