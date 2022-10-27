@@ -4,6 +4,7 @@ from warnings import warn
 
 class Node:
     """A node class for A* Pathfinding"""
+
     # not really Astar, more like "guided BFS"
     # h-function seems wrong but works well enough
 
@@ -20,6 +21,12 @@ class Node:
                 self.n = 7
         else:
             self.n = 0
+        if self.n == 5:
+            self.tosolve = 15
+            self.moves = 10
+        elif self.n == 7:
+            self.tosolve = 28
+            self.moves = 20
 
     def __eq__(self, other):
         return self.position == other.position
@@ -42,13 +49,18 @@ def astar(start, end):
     open_list.append([0, node_start])
 
     # Loop until you find the end
+    print("trying to solve waffle. this might take a minute")
     while len(open_list) > 0:
+        print("waffles closed:", len(closed_list))
+
         open_list = sorted(open_list, key=sorthelp)
-        open_list.reverse()
+        # open_list.reverse()
 
         # Get the current node
-        f, node_current = open_list.pop()
-        closed_list.append([node_current.f, node_current])
+        f, node_current = open_list.pop(0)
+        print("currently at step ", node_current.g)
+        print("with f-value", node_current.f)
+        closed_list.append(node_current)
 
         # Found the goal
         not_quite = False
@@ -62,7 +74,7 @@ def astar(start, end):
 
         # Generate neighbours
         if not_quite is False:
-            neighbors = []
+            neighbours = []
             switchable_positions = []
             unsolved_tiles = 0
             for i in range(len(node_current.position)):
@@ -72,19 +84,18 @@ def astar(start, end):
 
             switched_nodes = []
             switchpairs = []
-            for first_position in switchable_positions:
-                for second_position in switchable_positions:
+            for m in range(len(switchable_positions)):
+                for n in range(m, len(switchable_positions)):
                     switched_node = deepcopy(node_current)
-                    i, j = first_position, second_position
-                    if i == j:
+                    i, j = switchable_positions[m], switchable_positions[n]
+                    if [j, i] in switchpairs:
                         pass
-                    elif [j, i] in switchpairs:
+                    elif i == j:
                         pass
-                    elif (switched_node.position[j] != node_end.position[i]) and (
-                        switched_node.position[i] != node_end.position[j]
+
+                    elif (switched_node.position[j] == node_end.position[i]) or (
+                        switched_node.position[i] == node_end.position[j]
                     ):
-                        pass
-                    else:
                         switched_node.position[i], switched_node.position[j] = (
                             switched_node.position[j],
                             switched_node.position[i],
@@ -96,26 +107,33 @@ def astar(start, end):
                 # Create new node
                 new_node = Node(node_current, new_state.position)
                 # Append
-                neighbors.append(new_node)
+                neighbours.append(new_node)
 
             # Loop through children
-            for neighbour in neighbors:
+            for neighbour in neighbours:
                 # Create the f, g, and h values
                 neighbour.g = node_current.g + 1
                 temph = 0
                 for i in range(len(neighbour.position)):
                     if neighbour.position[i] != node_end.position[i]:
                         temph += 1
-                print(temph)
-                print(neighbour.g)
-                print(neighbour.position)
+                neighbour.h = temph
+                # print(temph)
+                # print(neighbour.g)
+                # print(neighbour.position)
                 skipit = False
+
                 if neighbour.n == 5:
                     if neighbour.g > 10:
                         skipit = True
-                if neighbour.n == 7:
+                elif neighbour.n == 7:
                     if neighbour.g > 20:
                         skipit = True
+                if neighbour.h > 0:
+                    if neighbour.moves - neighbour.g != 0:
+                        if (neighbour.moves - neighbour.g) / neighbour.h < 0.5:
+                            closed_list.append(neighbour)
+                            skipit = True
                 if skipit is False:
                     if temph == node_current.h:
                         pass
@@ -124,33 +142,54 @@ def astar(start, end):
                     else:
                         closed = False
                         for c in closed_list:
-                            if (neighbour.position == c[1].position) and (
-                                neighbour.g >= c[1].g
-                            ):
-                                closed = True
-                                break
+                            if neighbour.position == c.position:
+                                # print('cahmooooooon')
+                                if neighbour.g >= c.g:
+                                    closed = True
+                                    # print('already closed')
+                                    break
                         if closed is False:
                             in_open = False
                             for o in open_list:
-                                if (neighbour.position == o[1].position) and (
-                                    neighbour.g >= c[1].g
-                                ):
-                                    in_open = True
-                                    break
+                                if neighbour.position == o[1].position:
+                                    # print('already in open')
+                                    if neighbour.g >= o[1].g:
+                                        in_open = True
+                                        break
                             if in_open is False:
-                                neighbour.h = temph
-                                # Double switches get more weight / lesser f-value
-                                if neighbour.h == (node_current.h + 2):
-                                    neighbour.f = neighbour.g + neighbour.h
-                                # Single switches get a penalty
+                                if neighbour.h == (node_current.h - 2):
+                                    # what's the weight?
+                                    # neighbour.f = neighbour.g + neighbour.h
+                                    neighbour.f = 1 / (
+                                        neighbour.tosolve
+                                        - neighbour.h
+                                        + neighbour.moves
+                                        - neighbour.g
+                                    )
+                                    # print(neighbour.g,neighbour.f)
+                                    open_list.append([neighbour.f, neighbour])
+                                    break
                                 else:
-                                    neighbour.f = (neighbour.g + neighbour.h) ** 2
+                                    # neighbour.f = neighbour.g + neighbour.h
+                                    # 1/(solved + remaining)
+                                    neighbour.f = 1 / (
+                                        neighbour.tosolve
+                                        - neighbour.h
+                                        + neighbour.moves
+                                        - neighbour.g
+                                    )
+                                    # print('current status: step, f:',neighbour.g,neighbour.f)
+                                    if (
+                                        neighbour.h
+                                        == (neighbour.moves - neighbour.g) + 1
+                                    ):
+                                        open_list.append([neighbour.f, neighbour])
+                                        break
                                 qlen = len(open_list)
                                 if qlen == 0:
                                     open_list.append([neighbour.f, neighbour])
                                 else:
-                                    f_val = int(neighbour.f)
-                                    open_list.append([f_val, neighbour])
+                                    open_list.append([neighbour.f, neighbour])
 
     warn("Couldn't get a path to destination")
     return None
@@ -198,12 +237,14 @@ def main(startwaffle, endwaffle):
 
 if __name__ == "__main__":
 
-    inw = "piltaz i nzonoca a ghvale"
-    outw = "pizzai o ltangoc a nhalve"
+    # inw = "piltaz i nzonoca a ghvale"
+    # outw = "pizzai o ltangoc a nhalve"
     # inw =  'duernr l eimtaee o tdvvee'
     # outw = 'demonr e eutteri a vdelve'
     # inw = 'ondfrd a laoieaf e glgnel'
     # outw = 'odderf o eflinga n alegal'
-    # inw = 'henreubq n i tmerluree e q aduuotado o d yieearnc'
-    # outw = 'nunneryo u q imarqueea t a ldoubtedi r o echeered'
+    inw = "henreubq n i tmerluree e q aduuotado o d yieearnc"
+    outw = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
+    # inw = 'tcvcsrou o r dbpneares o i itsueiett e g coiehkar'
+    # outw = 'revisito e e rbandageo t s etouristi r c ocheckup'
     main(inw, outw)

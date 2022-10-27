@@ -165,7 +165,7 @@ def solve(waffle, candidate_list):
 
 # preprocessing not strictly necessary for recursive solution
 # but increases recursion speed 1000x-100000x
-def get_candidates(wordlist):
+def get_candidates(waffle, wordlist):
     waffle.print_state()
     candidate_list = {}
     state = waffle.state
@@ -222,11 +222,14 @@ def get_candidates(wordlist):
 
 
 def prep(waffle, initial_state):
+    all_chars = set()
     cwd = os.getcwd()
     if n == 5:
         solutions_file = os.path.join(cwd, "wordlist_5.txt")
         with open(solutions_file) as file:
             wordlist_unfiltered = set(line.strip() for line in file)
+        wordlist_unfiltered = [w.lower() for w in wordlist_unfiltered if len(w) == 5]
+
     elif n == 7:
         solutions_file = os.path.join(cwd, "wordlist_english_dict.txt")
         with open(solutions_file) as file:
@@ -246,29 +249,19 @@ def prep(waffle, initial_state):
     print("len wordlist post filter", len(wordlist))
 
     # more preprocessing, per line
-    candidate_list = get_candidates(wordlist)
+    candidate_list = get_candidates(waffle, wordlist)
     return waffle, candidate_list, wordlist_unfiltered
 
 
-if __name__ == "__main__":
+def main(initial_state):
 
-    # Set n to 5 or 7 depending on waffle size
-    # wafflestates are in wafflestate.py
-    n = 5
-
-    if n == 5:
-        initial_state = wafflestate.initial_state_five_9
-    elif n == 7:
-        initial_state = wafflestate.initial_state_seven_1
-
-    all_chars = set()
     waffle = WaffleNode(n)
     startstate = deepcopy(initial_state)
 
     waffle, candidate_list, wordlist_unfiltered = prep(waffle, initial_state)
 
     # uncomment to ignore preprocessing, use raw dictionary, watch number go up
-    '''
+    """
     candidate_list = {}
     for i in range(waffle.n)[0::2]:
         pos = "i" + str(i)
@@ -280,12 +273,13 @@ if __name__ == "__main__":
         print(pos)
         candidates = wordlist_unfiltered
         candidate_list[pos] = candidates
-    '''
+    """
     # go!
     solvedwaffle = solve(waffle, candidate_list)
     print("\n 🧇 🧇 🧇 Sucess! 🧇 🧇 🧇 \n")
     solvedwaffle.print_state_solved()
-
+    print("press Enter to continue")
+    input()
     astar_start = ""
     astar_end = ""
     for x in range(n):
@@ -295,6 +289,18 @@ if __name__ == "__main__":
             astar_start = astar_start + startstate[x][y][0]
             astar_end = astar_end + solvedwaffle.state[x][y][0]
 
-    # print(astar_start)
-    # print(astar_end)
+    print(astar_start)
+    print(astar_end)
     astar.main(astar_start, astar_end)
+
+
+if __name__ == "__main__":
+
+    # Set n to 5 or 7 depending on waffle size
+    # wafflestates are in wafflestate.py
+    n = 7
+    if n == 5:
+        initial_state = wafflestate.initial_state_five_7
+    elif n == 7:
+        initial_state = wafflestate.initial_state_seven_3
+    main(initial_state)
