@@ -254,7 +254,6 @@ def prep(waffle, initial_state):
 
 
 def main(initial_state):
-
     waffle = WaffleNode(n)
     startstate = deepcopy(initial_state)
 
@@ -288,14 +287,12 @@ def main(initial_state):
         for y in range(n):
             astar_start = astar_start + startstate[x][y][0]
             astar_end = astar_end + solvedwaffle.state[x][y][0]
-
     print(astar_start)
     print(astar_end)
     astar.main(astar_start, astar_end)
 
 
 if __name__ == "__main__":
-
     # Set n to 5 or 7 depending on waffle size
     # wafflestates are in wafflestate.py
     n = 7

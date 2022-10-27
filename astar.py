@@ -195,7 +195,6 @@ def main(startwaffle, endwaffle):
     path = astar(startwaffle, endwaffle)
     s = 0
     for index, result in enumerate(path):
-
         head = 0
         if len(result) == 25:
             n = 5
