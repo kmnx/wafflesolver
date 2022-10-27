@@ -300,7 +300,7 @@ if __name__ == "__main__":
     # wafflestates are in wafflestate.py
     n = 7
     if n == 5:
-        initial_state = wafflestate.initial_state_five_7
+        initial_state = wafflestate.initial_state_five_9
     elif n == 7:
         initial_state = wafflestate.initial_state_seven_3
     main(initial_state)

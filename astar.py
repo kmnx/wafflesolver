@@ -60,7 +60,7 @@ def astar(start, end):
         f, node_current = open_list.pop(0)
         print("currently at step ", node_current.g)
         print("with f-value", node_current.f)
-        closed_list.append(node_current)
+        #closed_list.append(node_current)
 
         # Found the goal
         not_quite = False
@@ -132,7 +132,7 @@ def astar(start, end):
                 if neighbour.h > 0:
                     if neighbour.moves - neighbour.g != 0:
                         if (neighbour.moves - neighbour.g) / neighbour.h < 0.5:
-                            closed_list.append(neighbour)
+                            #closed_list.append(neighbour)
                             skipit = True
                 if skipit is False:
                     if temph == node_current.h:
