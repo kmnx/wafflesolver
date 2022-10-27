@@ -160,28 +160,18 @@ def astar(start, end):
                                 if neighbour.h == (node_current.h - 2):
                                     # what's the weight?
                                     # neighbour.f = neighbour.g + neighbour.h
-                                    neighbour.f = 1 / (
-                                        neighbour.tosolve
-                                        - neighbour.h
-                                        + neighbour.moves
-                                        - neighbour.g
-                                    )
+                                    neighbour.f = 1 / (neighbour.tosolve - neighbour.h + neighbour.moves - neighbour.g)
                                     # print(neighbour.g,neighbour.f)
                                     open_list.append([neighbour.f, neighbour])
                                     break
                                 else:
                                     # neighbour.f = neighbour.g + neighbour.h
                                     # 1/(solved + remaining)
-                                    neighbour.f = 1 / (
-                                        neighbour.tosolve
-                                        - neighbour.h
-                                        + neighbour.moves
-                                        - neighbour.g
-                                    )
+                                    # best so far
+                                    neighbour.f = 1 / (neighbour.tosolve - neighbour.h + neighbour.moves - neighbour.g)
                                     # print('current status: step, f:',neighbour.g,neighbour.f)
                                     if (
-                                        neighbour.h
-                                        == (neighbour.moves - neighbour.g) + 1
+                                        neighbour.h == (neighbour.moves - neighbour.g) + 1
                                     ):
                                         open_list.append([neighbour.f, neighbour])
                                         break
@@ -243,8 +233,8 @@ if __name__ == "__main__":
     # outw = 'demonr e eutteri a vdelve'
     # inw = 'ondfrd a laoieaf e glgnel'
     # outw = 'odderf o eflinga n alegal'
-    inw = "henreubq n i tmerluree e q aduuotado o d yieearnc"
-    outw = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
-    # inw = 'tcvcsrou o r dbpneares o i itsueiett e g coiehkar'
-    # outw = 'revisito e e rbandageo t s etouristi r c ocheckup'
+    #inw = "henreubq n i tmerluree e q aduuotado o d yieearnc"
+    #outw = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
+    inw = 'tcvcsrou o r dbpneares o i itsueiett e g coiehkar'
+    outw = 'revisito e e rbandageo t s etouristi r c ocheckup'
     main(inw, outw)
