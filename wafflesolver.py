@@ -3,7 +3,7 @@ import sys
 from copy import deepcopy
 import wafflestate
 import astar
-
+import tkinter as tk
 sys.setrecursionlimit(10**6)
 
 
@@ -295,9 +295,11 @@ def main(initial_state):
 if __name__ == "__main__":
     # Set n to 5 or 7 depending on waffle size
     # wafflestates are in wafflestate.py
+    window = tk.Tk()
+    
     n = 7
     if n == 5:
-        initial_state = wafflestate.initial_state_five_9
+        initial_state = wafflestate.initial_state_five_305
     elif n == 7:
-        initial_state = wafflestate.initial_state_seven_3
+        initial_state = wafflestate.initial_state_seven_27
     main(initial_state)

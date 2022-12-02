@@ -43,7 +43,7 @@ def astar(start, end):
 
     # Initialize both open and closed list
     open_list = []
-    closed_list = []
+    closed_list = set()
 
     # Add the start node
     open_list.append([0, node_start])
@@ -60,7 +60,7 @@ def astar(start, end):
         f, node_current = open_list.pop(0)
         print("currently at step ", node_current.g)
         print("with f-value", node_current.f)
-        #closed_list.append(node_current)
+        closed_list.add(''.join(node_current.position))
 
         # Found the goal
         not_quite = False
@@ -107,7 +107,8 @@ def astar(start, end):
                 # Create new node
                 new_node = Node(node_current, new_state.position)
                 # Append
-                neighbours.append(new_node)
+                if ''.join(new_node.position) not in closed_list:
+                    neighbours.append(new_node)
 
             # Loop through children
             for neighbour in neighbours:
@@ -132,7 +133,7 @@ def astar(start, end):
                 if neighbour.h > 0:
                     if neighbour.moves - neighbour.g != 0:
                         if (neighbour.moves - neighbour.g) / neighbour.h < 0.5:
-                            #closed_list.append(neighbour)
+                            closed_list.add(neighbour.state)
                             skipit = True
                 if skipit is False:
                     if temph == node_current.h:
@@ -141,13 +142,11 @@ def astar(start, end):
                         open_list.append([neighbour.f, neighbour])
                     else:
                         closed = False
-                        for c in closed_list:
-                            if neighbour.position == c.position:
-                                # print('cahmooooooon')
-                                if neighbour.g >= c.g:
-                                    closed = True
-                                    # print('already closed')
-                                    break
+                        
+                        if ''.join(neighbour.position) in closed_list:
+                            closed = True
+                            # print('already closed')
+                            break
                         if closed is False:
                             in_open = False
                             for o in open_list:
