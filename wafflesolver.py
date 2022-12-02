@@ -153,7 +153,7 @@ def solve(waffle, candidate_list):
                     waffle.attempts += 1
                     switchedwaffle = switch_chars(waffle, candidate, pos)
                     if switchedwaffle:
-                        waffle.print_state_solved()
+                        #waffle.print_state_solved()
                         # last line attempt successful, attempt next line
                         solve(switchedwaffle, candidate_list)
                     if waffle.solved is False:
@@ -278,7 +278,7 @@ def main(initial_state):
     print("\n 🧇 🧇 🧇 Sucess! 🧇 🧇 🧇 \n")
     solvedwaffle.print_state_solved()
     print("press Enter to continue")
-    input()
+    #input()
     astar_start = ""
     astar_end = ""
     for x in range(n):
@@ -295,11 +295,36 @@ def main(initial_state):
 if __name__ == "__main__":
     # Set n to 5 or 7 depending on waffle size
     # wafflestates are in wafflestate.py
-    window = tk.Tk()
+    # window = tk.Tk()
     
     n = 7
     if n == 5:
-        initial_state = wafflestate.initial_state_five_305
+        initial_state = wafflestate.initial_state_five_10
     elif n == 7:
-        initial_state = wafflestate.initial_state_seven_27
-    main(initial_state)
+        initial_state = wafflestate.initial_state_seven_5
+    
+    main(wafflestate.initial_state_seven_1)
+    main(wafflestate.initial_state_seven_2)
+    main(wafflestate.initial_state_seven_3)
+    main(wafflestate.initial_state_seven_4)
+    main(wafflestate.initial_state_seven_5)
+    
+    n = 5
+    
+    main(wafflestate.initial_state_five_1)
+    main(wafflestate.initial_state_five_2)
+    main(wafflestate.initial_state_five_3)
+    main(wafflestate.initial_state_five_4)
+    main(wafflestate.initial_state_five_5)
+    
+    main(wafflestate.initial_state_five_6)
+    main(wafflestate.initial_state_five_7)
+    main(wafflestate.initial_state_five_8)
+    main(wafflestate.initial_state_five_9)
+    main(wafflestate.initial_state_five_10)
+    main(wafflestate.initial_state_five_11)
+    main(wafflestate.initial_state_five_12)
+    main(wafflestate.initial_state_five_13)
+    
+    
+    

@@ -91,7 +91,7 @@ initial_state_five_10 = [
 ]
 
 # waffle # 305
-initial_state_five_305 = [
+initial_state_five_11 = [
     [["s", "g"], ["r", "n"], ["g", "n"], ["m", "n"], ["f", "g"]],
     [["k", "n"], [" ", " "], ["o", "y"], [" ", " "], ["m", "y"]],
     [["t", "y"], ["r", "n"], ["e", "g"], ["r", "n"], ["o", "y"]],
@@ -100,7 +100,7 @@ initial_state_five_305 = [
 ]
 
 # waffle # 308
-initial_state_five_308 = [
+initial_state_five_12 = [
     [["b", "g"], ["l", "n"], ["e", "y"], ["g", "n"], ["l", "g"]],
     [["c", "y"], [" ", " "], ["n", "y"], [" ", " "], ["r", "y"]],
     [["i", "y"], ["a", "n"], ["b", "g"], ["a", "n"], ["a", "y"]],
@@ -109,7 +109,7 @@ initial_state_five_308 = [
 ]
 
 # waffle # 309
-initial_state_five_309 = [
+initial_state_five_13 = [
     [["r", "g"], ["a", "n"], ["u", "y"], ["m", "n"], ["r", "g"]],
     [["e", "n"], [" ", " "], ["u", "n"], [" ", " "], ["l", "y"]],
     [["a", "n"], ["b", "n"], ["g", "g"], ["l", "y"], ["e", "n"]],
@@ -319,7 +319,7 @@ initial_state_seven_3 = [
 ]
 
 # deluxe waffle 26
-initial_state_seven_26 = [
+initial_state_seven_4 = [
     [
         ["s", "n"],
         ["s", "n"],
@@ -386,7 +386,7 @@ initial_state_seven_26 = [
 ]
 
 # deluxe waffle 27
-initial_state_seven_27 = [
+initial_state_seven_5 = [
     [
         ["a", "n"],
         ["d", "n"],
