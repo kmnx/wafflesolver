@@ -5,7 +5,7 @@ from warnings import warn
 class Node:
     """A node class for A* Pathfinding"""
 
-    # not really Astar, more like "guided BFS"
+    # more like "guided BFS"
     # h-function seems wrong but works well enough
 
     def __init__(self, parent=None, position=None):
@@ -53,15 +53,14 @@ def astar(start, end):
     # Loop until you find the end
     print("trying to solve waffle. this might take a minute")
     while len(open_list) > 0:
-        #print("waffles closed:", len(closed_list))
+        # print("waffles closed:", len(closed_list))
 
         open_list = sorted(open_list, key=sorthelp)
         # open_list.reverse()
-
         # Get the current node
         f, node_current = open_list.pop(0)
-        #print("currently at step ", node_current.g)
-        #print("with f-value", node_current.f)
+        # print("currently at step ", node_current.g)
+        # print("with f-value", node_current.f)
         closed_list.add(node_current.position)
 
         # Found the goal
@@ -88,7 +87,7 @@ def astar(start, end):
             switchpairs = []
             for m in range(len(switchable_positions)):
                 for n in range(m, len(switchable_positions)):
-                    
+
                     i, j = switchable_positions[m], switchable_positions[n]
                     if [j, i] in switchpairs:
                         pass
@@ -96,7 +95,6 @@ def astar(start, end):
                         pass
 
                     else:
-                        
                         if (node_current.position[j] == node_end.position[i]) or (
                             node_current.position[i] == node_end.position[j]
                         ):
@@ -106,7 +104,7 @@ def astar(start, end):
                                 switched_node_list[j],
                                 switched_node_list[i],
                             )
-                            switched_node_str = ''.join(switched_node_list)
+                            switched_node_str = "".join(switched_node_list)
                             switched_node.position = switched_node_str
                             switched_nodes.append(switched_node)
                             switchpairs.append([i, j])
@@ -127,9 +125,6 @@ def astar(start, end):
                     if neighbour.position[i] != node_end.position[i]:
                         temph += 1
                 neighbour.h = temph
-                # print(temph)
-                # print(neighbour.g)
-                # print(neighbour.position)
                 skipit = False
 
                 if neighbour.n == 5:
@@ -138,13 +133,7 @@ def astar(start, end):
                 elif neighbour.n == 7:
                     if neighbour.g > 20:
                         skipit = True
-                '''
-                if neighbour.h > 0:
-                    if neighbour.moves - neighbour.g != 0:
-                        if (neighbour.moves - neighbour.g) / neighbour.h < 0.5:
-                            closed_list.add(neighbour.state)
-                            skipit = True
-                '''
+
                 if skipit is False:
                     if temph == node_current.h:
                         pass
@@ -153,68 +142,30 @@ def astar(start, end):
                         open_set.add(neighbour.position)
                     else:
                         closed = False
-                        
                         if neighbour.position in closed_list:
                             closed = True
                             # print('already closed')
                             break
                         if closed is False:
                             in_open = False
-                            '''
-                            for o in open_list:
-                                if neighbour.position == o[1].position:
-                                    # print('already in open')
-                                    if neighbour.g >= o[1].g:
-                                        in_open = True
-                                        break
-                            '''
                             if neighbour.position in open_set:
                                 in_open = True
-                                #print(neighbour.position)
-                                #break
-
-                            
 
                             if in_open is False:
-                                '''
-                                if neighbour.h == (node_current.h - 2):
-                                    # what's the weight?
-                                    # neighbour.f = neighbour.g + neighbour.h
-                                    neighbour.f = 1 / (neighbour.tosolve - neighbour.h + neighbour.moves - neighbour.g)
-                                    # print(neighbour.g,neighbour.f)
-                                    if neighbour.f < node_current.f:
-                                        open_list = []
-                                    open_list.append([neighbour.f, neighbour])
-                                    open_set.add(neighbour.position)
-                                    break
-                                else:
-                                '''
-                                    # neighbour.f = neighbour.g + neighbour.h
-                                    # 1/(solved + remaining)
-                                    # best so far
-                                neighbour.f = 1 / (neighbour.tosolve - neighbour.h + neighbour.moves - neighbour.g)
-                                    # print('current status: step, f:',neighbour.g,neighbour.f)
-                                    #if (
-                                    #    neighbour.h == (neighbour.moves - neighbour.g) + 1
-                                    #):
+                                # what's the weight?
+                                # neighbour.f = neighbour.g + neighbour.h
+                                # 1/(solved + remaining)
+                                # best so far
+                                neighbour.f = 1 / (
+                                    neighbour.tosolve
+                                    - neighbour.h
+                                    + neighbour.moves
+                                    - neighbour.g
+                                )
                                 if neighbour.f < node_current.f:
                                     open_list = []
                                 open_list.append([neighbour.f, neighbour])
                                 open_set.add(neighbour.position)
-                                #break
-                                qlen = len(open_list)
-                                '''
-                                if qlen == 0:
-                                    open_list.append([neighbour.f, neighbour])
-                                    open_set.add(neighbour.position)
-                                
-                                else:
-                                    if neighbour.f < node_current.f:
-                                        open_list = []
-                                    open_list.append([neighbour.f, neighbour])
-
-                                    open_set.add(neighbour.position)
-                                '''
 
     warn("Couldn't get a path to destination")
     return None
@@ -225,7 +176,7 @@ def sorthelp(item):
 
 
 def main(startwaffle, endwaffle):
-    # startwaffle = [c for c in startwaffle]
+    # startwaffle = [c for c in startwaffle]
     # endwaffle = [c for c in endwaffle]
     path = astar(startwaffle, endwaffle)
     s = 0
@@ -267,8 +218,8 @@ if __name__ == "__main__":
     # outw = 'demonr e eutteri a vdelve'
     # inw = 'ondfrd a laoieaf e glgnel'
     # outw = 'odderf o eflinga n alegal'
-    #inw = "henreubq n i tmerluree e q aduuotado o d yieearnc"
-    #outw = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
-    #inw = 'tcvcsrou o r dbpneares o i itsueiett e g coiehkar'
-    #outw = 'revisito e e rbandageo t s etouristi r c ocheckup'
+    # inw = "henreubq n i tmerluree e q aduuotado o d yieearnc"
+    # outw = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
+    # inw = 'tcvcsrou o r dbpneares o i itsueiett e g coiehkar'
+    # outw = 'revisito e e rbandageo t s etouristi r c ocheckup'
     main(inw, outw)
