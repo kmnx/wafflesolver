@@ -573,6 +573,7 @@ dolly
 donor
 donut
 dopey
+dotty
 doubt
 dough
 dowdy
@@ -1038,6 +1039,7 @@ inlay
 inlet
 inner
 input
+inset
 inter
 intro
 ionic

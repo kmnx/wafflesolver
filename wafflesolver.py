@@ -142,6 +142,8 @@ def solve(waffle, candidate_list):
 
     for pos in positions:
         # skip further candidates for solved lines
+        # print('checking position', pos)
+        # print('candidates:',candidate_list)
         if line_is_solved(waffle, pos):
             # if it's the last line then whole waffle must be solved
             if pos == positions[-1]:
@@ -250,6 +252,7 @@ def prep(waffle, initial_state):
 
     # more preprocessing, per line
     candidate_list = get_candidates(waffle, wordlist)
+    print(candidate_list)
     return waffle, candidate_list, wordlist_unfiltered
 
 
@@ -294,18 +297,19 @@ if __name__ == "__main__":
     # Set n to 5 or 7 depending on waffle size
     # wafflestates are in wafflestate.py
 
-    n = 7
+    n = 5
     if n == 5:
-        initial_state = wafflestate.initial_state_five_10
+        initial_state = wafflestate.initial_state_five_18
     elif n == 7:
         initial_state = wafflestate.initial_state_seven_5
-
+    n = 7
+    
     main(wafflestate.initial_state_seven_1)
     main(wafflestate.initial_state_seven_2)
     main(wafflestate.initial_state_seven_3)
     main(wafflestate.initial_state_seven_4)
     main(wafflestate.initial_state_seven_5)
-
+    
     n = 5
 
     main(wafflestate.initial_state_five_1)
@@ -322,4 +326,7 @@ if __name__ == "__main__":
     main(wafflestate.initial_state_five_12)
     main(wafflestate.initial_state_five_13)
     main(wafflestate.initial_state_five_14)
-    main(wafflestate.initial_state_five_15)
+    #main(wafflestate.initial_state_five_15)
+    main(wafflestate.initial_state_five_16)
+    main(wafflestate.initial_state_five_17)
+    main(wafflestate.initial_state_five_18)
