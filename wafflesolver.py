@@ -156,10 +156,10 @@ def solve(waffle, candidate_list):
                     switchedwaffle = switch_chars(waffle, candidate, pos)
                     if switchedwaffle:
                         # waffle.print_state_solved()
-                        # last line attempt successful, attempt next line
+                        # previous line attempt successful, attempt next line
                         solve(switchedwaffle, candidate_list)
                     if waffle.solved is False:
-                        # undo solved markers after stepping out of failed recursion
+                        # changed solved markers to unsolved after stepping out of failed recursion
                         unsolve(waffle, pos)
 
             return switchedwaffle
@@ -244,10 +244,16 @@ def prep(waffle, initial_state):
         for j in range(n):
             waffle.state[i][j] = initial_state[i][j]
             all_chars.add(initial_state[i][j][0])
-    # naive wordlist processing, keep only words with chars existing in waffle
+    # naive wordlist preprocessing, keep only words with chars existing in waffle
     print("len wordlist pre filter", len(wordlist_unfiltered))
-    for i in range(waffle.n):
-        wordlist = [w for w in wordlist_unfiltered if (w[i] in all_chars)]
+    wordlist = []
+    for w in wordlist_unfiltered:
+        for i in range(waffle.n):
+            if w[i] not in all_chars:
+                break
+            else:
+                if i == waffle.n - 1:
+                    wordlist.append(w)
     print("len wordlist post filter", len(wordlist))
 
     # more preprocessing, per line
@@ -288,6 +294,7 @@ def main(initial_state):
         for y in range(n):
             astar_start = astar_start + startstate[x][y][0]
             astar_end = astar_end + solvedwaffle.state[x][y][0]
+    # astar go!
     print(astar_start)
     print(astar_end)
     astar.main(astar_start, astar_end)
@@ -296,22 +303,14 @@ def main(initial_state):
 if __name__ == "__main__":
     # Set n to 5 or 7 depending on waffle size
     # wafflestates are in wafflestate.py
-
-    n = 5
-    if n == 5:
-        initial_state = wafflestate.initial_state_five_18
-    elif n == 7:
-        initial_state = wafflestate.initial_state_seven_5
     n = 7
-    
     main(wafflestate.initial_state_seven_1)
     main(wafflestate.initial_state_seven_2)
     main(wafflestate.initial_state_seven_3)
     main(wafflestate.initial_state_seven_4)
     main(wafflestate.initial_state_seven_5)
-    
-    n = 5
 
+    n = 5
     main(wafflestate.initial_state_five_1)
     main(wafflestate.initial_state_five_2)
     main(wafflestate.initial_state_five_3)
@@ -326,7 +325,8 @@ if __name__ == "__main__":
     main(wafflestate.initial_state_five_12)
     main(wafflestate.initial_state_five_13)
     main(wafflestate.initial_state_five_14)
-    #main(wafflestate.initial_state_five_15)
+    # waffle 310 / five_15 has insufficient starting information which leads to 2 possible solutions
+    # main(wafflestate.initial_state_five_15)
     main(wafflestate.initial_state_five_16)
     main(wafflestate.initial_state_five_17)
     main(wafflestate.initial_state_five_18)

@@ -1,13 +1,11 @@
 from copy import deepcopy
 from warnings import warn
 
-steps = ['csroeu z votoaen f aeertr', 'csroeu z vatooen f aeertr', 'csroeu z vatootn f aeerer', 'csroeu z vatootn f eearer', 'csrzeu o vatootn f eearer', 'csrveu o zatootn f eearer', 'csrveu o natootz f eearer', 'curves o natootz f eearer', 'curvef o natootz s eearer', 'curvet o nafootz s eearer', 'curver o nafootz s eeater']
 
 class Node:
     """A node class for A* Pathfinding"""
 
-    # more like "guided BFS"
-    # h-function seems wrong but works well enough
+    # more like BFS on rails
 
     def __init__(self, parent=None, position=None):
         self.parent = parent
@@ -46,7 +44,6 @@ def astar(start, end):
     open_list = []
     closed_set = set()
     open_set = set()
-    closed_list=[]
 
     # Add the start node
     open_list.append([0, node_start])
@@ -60,9 +57,6 @@ def astar(start, end):
         f, node_current = open_list.pop(0)
         # print("currently at step ", node_current.g)
         # print("with f-value", node_current.f)
-        closed_list.append([f,node_current])
-        #print('len open list',len(open_list))
-        #print('len closed set',len(closed_set))
 
         # Found the goal
         if node_current.position == node_end.position:
@@ -82,48 +76,37 @@ def astar(start, end):
 
         switched_nodes = []
         switchpairs = []
-        doubleswitch = False
 
         for m in range(len(switchable_positions)):
-            if doubleswitch == True:
-                break
-            else:
-                for n in range(m, len(switchable_positions)):
-                    i, j = switchable_positions[m], switchable_positions[n]
-                    if [j, i] in switchpairs:
-                        pass
-                    elif i == j:
-                        pass
-
-                    else:
-                        if (node_current.position[j] == node_end.position[i]) or (
-                            node_current.position[i] == node_end.position[j]
-                        ):
-                            switched_node = deepcopy(node_current)
-                            #  to switch chars convert str to list and back to str
-                            switched_node_list = [c for c in switched_node.position]
-                            switched_node_list[i], switched_node_list[j] = (
-                                switched_node_list[j],
-                                switched_node_list[i],
-                            )
-                            switched_node_str = "".join(switched_node_list)
-                            switched_node.position = switched_node_str
-                            switched_nodes.append(switched_node)
-                            switchpairs.append([i, j])
-                            # print('processed switchpair',switchpairs)
+            for n in range(m, len(switchable_positions)):
+                i, j = switchable_positions[m], switchable_positions[n]
+                if [j, i] in switchpairs:
+                    pass
+                elif i == j:
+                    pass
+                else:
+                    if (node_current.position[j] == node_end.position[i]) or (
+                        node_current.position[i] == node_end.position[j]
+                    ):
+                        switched_node = deepcopy(node_current)
+                        #  to switch chars convert str to list and back to str
+                        switched_node_list = [c for c in switched_node.position]
+                        switched_node_list[i], switched_node_list[j] = (
+                            switched_node_list[j],
+                            switched_node_list[i],
+                        )
+                        switched_node_str = "".join(switched_node_list)
+                        switched_node.position = switched_node_str
+                        switched_nodes.append(switched_node)
+                        switchpairs.append([i, j])
 
         for new_state in switched_nodes:
             # Create new node
             new_node = Node(node_current, new_state.position)
             # Append
-            if new_node.position in closed_set:
-                print('position is closed')
-            '''if new_node.position not in closed_set:
+            if new_node.position not in closed_set:
                 if new_node.position not in open_set:
-                    # requires check if f-value is lower
-                    for node in neighbours:
-                        if node[1].position'''
-            neighbours.append(new_node)
+                    neighbours.append(new_node)
 
         # Loop through children
         for neighbour in neighbours:
@@ -151,50 +134,27 @@ def astar(start, end):
                     open_set.add(neighbour.position)
                 else:
                     closed = False
-                    winstep = False
-                    if neighbour.position in steps:
-                        #print('found a winning step')
-                        winstep = True
-                    if [f,neighbour] in closed_list:
+                    if neighbour.position in closed_set:
                         closed = True
-                        #print('already closed')
-                        break
-                    
+
                     if closed is False:
                         in_open = False
+                        # the important part
+                        # distance estimation f only goes down for swaps resulting in 2 greens
+                        # everything else might just be an intermediate step
+                        # f = 1 / ( total tiles to solve - solved tiles + max total moves - done moves)
                         neighbour.f = 1 / (
-                                neighbour.tosolve
-                                - neighbour.h
-                                + neighbour.moves
-                                - neighbour.g
-                            )
+                            neighbour.tosolve
+                            - neighbour.h
+                            + neighbour.moves
+                            - neighbour.g
+                        )
                         if neighbour.position in open_set:
                             in_open = True
-                            #print('already in open_set')
-                            #print(neighbour in open_list)
-                            for node in open_list:
-                                if node[1].position == neighbour.position:
-                                    #print('are they the same',node[1] == neighbour)
-                                    #print('found in open list')
-                                    #print('existing f:',node[1].f)
-                                    #print('new f:',neighbour.f)
-                                    if neighbour == node[1]:
-                                        pass
-                                        
-                                    else:
-                                        #print('lesser f, add it')
-                                        open_list.append([neighbour.f, neighbour])
-                                    
-
-
 
                         if in_open is False:
-                            # distance f only goes down for swaps resulting in 2 greens
-                            
-
                             open_list.append([neighbour.f, neighbour])
                             open_set.add(neighbour.position)
-                            
 
     warn("Couldn't get a path to destination")
     return None
@@ -209,10 +169,8 @@ def main(startwaffle, endwaffle):
     # endwaffle = [c for c in endwaffle]
     path = astar(startwaffle, endwaffle)
     s = 0
-    steplist = []
     for index, result in enumerate(path):
         head = 0
-        steplist.append(result)
         if len(result) == 25:
             n = 5
         elif len(result) == 49:
@@ -239,7 +197,6 @@ def main(startwaffle, endwaffle):
         print(switches)
         print(" ")
         prev_waffle = deepcopy(current_waffle)
-    print(steplist)
 
 
 if __name__ == "__main__":
@@ -256,6 +213,6 @@ if __name__ == "__main__":
     # outw = 'revisito e e rbandageo t s etouristi r c ocheckup'
     # inw = "gtoage t nnlseio l idekny"
     # outw = "goingl n eaislen e kdotty"
-    inw = 'csroeu z votoaen f aeertr'
-    outw ='curver o nafootz s eeater'
+    inw = "csroeu z votoaen f aeertr"
+    outw = "curver o nafootz s eeater"
     main(inw, outw)
