@@ -202,6 +202,8 @@ def get_candidates(waffle, wordlist):
         candidate_list[pos] = candidates
     # filter columns
     for j in range(n)[0::2]:
+        maybelist = []
+        nolist = []
         pos = "j" + str(j)
         candidates = wordlist
         for i in range(waffle.n):
@@ -217,6 +219,48 @@ def get_candidates(waffle, wordlist):
                     candidates = [w for w in candidates if (w[i] != char)]
             elif colour == "n":
                 candidates = [w for w in candidates if (w[i] != char)]
+        for i in range(waffle.n):
+            char = state[i][j][0]
+            colour = state[i][j][1]
+            if colour in ["y", "g"]:
+                maybelist.append(state[i][j][0])
+        for i in range(waffle.n):
+            char = state[i][j][0]
+            colour = state[i][j][1]
+            if colour == "n":
+                nolist.append(state[i][j][0])
+
+        solutions = [
+            "nunnery",
+            "marquee",
+            "doubted",
+            "cheered",
+            "nomadic",
+            "nurture",
+            "equator",
+            "yielded",
+        ]
+        for no in nolist:
+            print("no:", no)
+            for idx, candidate in enumerate(candidates):
+                if candidate in solutions:
+                    print("solution:", candidate)
+                splitc = [c for c in candidate]
+                if no not in splitc:
+                    if candidate in solutions:
+                        print("no not in splitc:", candidate)
+                    pass
+
+                else:
+                    if no in maybelist:
+                        if candidate in solutions:
+                            print("solution:", candidate)
+                            print("in maybelist")
+                        pass
+                    else:
+                        if candidate in solutions:
+                            print("deleted solution:", candidate)
+                        del candidates[idx]
 
         candidate_list[pos] = candidates
 
@@ -240,8 +284,8 @@ def prep(waffle, initial_state):
         wordlist_unfiltered = [w.lower() for w in wordlist_unfiltered if len(w) == 7]
         print("len dict", len(wordlist_unfiltered))
 
-    for i in range(n):
-        for j in range(n):
+    for i in range(waffle.n):
+        for j in range(waffle.n):
             waffle.state[i][j] = initial_state[i][j]
             all_chars.add(initial_state[i][j][0])
     # naive wordlist preprocessing, keep only words with chars existing in waffle
@@ -309,6 +353,7 @@ if __name__ == "__main__":
     main(wafflestate.initial_state_seven_3)
     main(wafflestate.initial_state_seven_4)
     main(wafflestate.initial_state_seven_5)
+    main(wafflestate.initial_state_seven_6)
 
     n = 5
     main(wafflestate.initial_state_five_1)
@@ -325,8 +370,7 @@ if __name__ == "__main__":
     main(wafflestate.initial_state_five_12)
     main(wafflestate.initial_state_five_13)
     main(wafflestate.initial_state_five_14)
-    # waffle 310 / five_15 has insufficient starting information which leads to 2 possible solutions
-    # main(wafflestate.initial_state_five_15)
+    main(wafflestate.initial_state_five_15)
     main(wafflestate.initial_state_five_16)
     main(wafflestate.initial_state_five_17)
     main(wafflestate.initial_state_five_18)
