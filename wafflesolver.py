@@ -241,25 +241,25 @@ def get_candidates(waffle, wordlist):
             "yielded",
         ]
         for no in nolist:
-            print("no:", no)
+            #print("no:", no)
             for idx, candidate in enumerate(candidates):
-                if candidate in solutions:
-                    print("solution:", candidate)
+                #if candidate in solutions:
+                    #print("solution:", candidate)
                 splitc = [c for c in candidate]
                 if no not in splitc:
-                    if candidate in solutions:
-                        print("no not in splitc:", candidate)
+                    #if candidate in solutions:
+                        #print("no not in splitc:", candidate)
                     pass
 
                 else:
                     if no in maybelist:
-                        if candidate in solutions:
-                            print("solution:", candidate)
-                            print("in maybelist")
+                        #if candidate in solutions:
+                            #print("solution:", candidate)
+                            #print("in maybelist")
                         pass
                     else:
-                        if candidate in solutions:
-                            print("deleted solution:", candidate)
+                        #if candidate in solutions:
+                            #print("deleted solution:", candidate)
                         del candidates[idx]
 
         candidate_list[pos] = candidates
@@ -366,7 +366,7 @@ if __name__ == "__main__":
     main(wafflestate.initial_state_five_16)
     main(wafflestate.initial_state_five_17)
     main(wafflestate.initial_state_five_18)
-    
+
     n = 7
     main(wafflestate.initial_state_seven_1)
     main(wafflestate.initial_state_seven_2)
