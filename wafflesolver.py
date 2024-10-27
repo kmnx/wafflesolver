@@ -3,7 +3,7 @@ import sys
 from copy import deepcopy
 import wafflestate
 import astar
-import astar24
+import cycle_decomposition
 import time  # Import the time module
 start_time = time.time()
 
@@ -333,7 +333,7 @@ def main(initial_state):
     solvedwaffle = solve(waffle, candidate_list)
     print("\n 🧇 🧇 🧇 Sucess! 🧇 🧇 🧇 \n")
     solvedwaffle.print_state_solved()
-    print("press Enter to continue")
+    #print("press Enter to continue")
     # input()
     astar_start = ""
     astar_end = ""
@@ -344,7 +344,11 @@ def main(initial_state):
     # astar go!
     print(astar_start)
     print(astar_end)
-    astar.main(astar_start, astar_end)
+    # deprecated fake A*, which wasn't really A*, more like "custom BFS"
+    # astar.main(astar_start, astar_end)
+
+    # shiny new cycle decomposition, about 10x faster than the faulty pseudo-A*
+    cycle_decomposition.main(astar_start, astar_end)
 
 
 if __name__ == "__main__":
