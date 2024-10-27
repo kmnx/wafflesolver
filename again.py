@@ -1,5 +1,5 @@
 import copy
-
+import heapq
 #scrambled = "DBDFAFECBCAE"
 #solution = "AABBCCDDEEFF"
 # waffle 310
@@ -43,6 +43,11 @@ while bigstack:
             visitedlist.append(i)
     if len(visitedlist) == len(solution):
         solutionstack.append(wholecycle)
+        solvecounter = 0
+        for cycle in wholecycle:
+            solvecounter = solvecounter + len(cycle)-1
+        if solvecounter == 10:
+            break
         continue
     localcycle = wholecycle[-1]
     for index, char in enumerate(solution):
@@ -57,14 +62,17 @@ while bigstack:
                     #print("oh")
                     # if it's the very first one, open a new cycle
                     if index == localcycle[0]:
-                        localset = frozenset(localcycle)
-                        
-                        if localset in cyclopedia:
+                        whole_frozen = []
+                        for set in wholecycle:
+                            localset = frozenset(set)
+                            whole_frozen.append(localset)
+                        whole_frozen_set = frozenset(whole_frozen)
+                        if whole_frozen_set in cyclopedia:
                             # we just stop, if it's in there we will find the other permutations
                             #print("found ",localset, "in the cyclopedia")
                             continue
                         else:
-                            #cyclopedia.add(localset)
+                            cyclopedia.add(whole_frozen_set)
                             pass
 
                         nextlocalcycle = []
