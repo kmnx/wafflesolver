@@ -55,8 +55,7 @@ def astar(start, end):
         open_list = sorted(open_list, key=sorthelp)
         # Get the current node
         f, node_current = open_list.pop(0)
-        # print("currently at step ", node_current.g)
-        # print("with f-value", node_current.f)
+        #print("currently at step ", node_current.g, "with f-value", node_current.f)
 
         # Found the goal
         if node_current.position == node_end.position:
@@ -102,10 +101,11 @@ def astar(start, end):
 
         for new_state in switched_nodes:
             # Create new node
-            new_node = Node(node_current, new_state.position)
+            
             # Append
-            if new_node.position not in closed_set:
-                if new_node.position not in open_set:
+            if new_state.position not in closed_set:
+                if new_state.position not in open_set:
+                    new_node = Node(node_current, new_state.position)
                     neighbours.append(new_node)
 
         # Loop through children
@@ -207,12 +207,16 @@ if __name__ == "__main__":
     # outw = 'demonr e eutteri a vdelve'
     # inw = 'ondfrd a laoieaf e glgnel'
     # outw = 'odderf o eflinga n alegal'
-    # inw = "henreubq n i tmerluree e q aduuotado o d yieearnc"
-    # outw = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
-    # inw = 'tcvcsrou o r dbpneares o i itsueiett e g coiehkar'
-    # outw = 'revisito e e rbandageo t s etouristi r c ocheckup'
+    #inw = "henreubq n i tmerluree e q aduuotado o d yieearnc"
+    #outw = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
+    #inw = 'tcvcsrou o r dbpneares o i itsueiett e g coiehkar'
+    #outw = 'revisito e e rbandageo t s etouristi r c ocheckup'
     # inw = "gtoage t nnlseio l idekny"
     # outw = "goingl n eaislen e kdotty"
-    inw = "csroeu z votoaen f aeertr"
-    outw = "curver o nafootz s eeater"
+    #inw = "csroeu z votoaen f aeertr"
+    #outw = "curver o nafootz s eeater"
+    #inw = "adotpwet a b rahscocde n e dtpibueen r h rtrgceuh"
+    #outw = "chopperh u r eabscondt t d htributee n c aragweed"
+    inw = "tcvcsrou o r dbpneares o i itsueiett e g coiehkar"
+    outw = "revisito e e rbandageo t s etouristi r c ocheckup"
     main(inw, outw)

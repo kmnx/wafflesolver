@@ -3,6 +3,9 @@ import sys
 from copy import deepcopy
 import wafflestate
 import astar
+import astar24
+import time  # Import the time module
+start_time = time.time()
 
 sys.setrecursionlimit(10**6)
 
@@ -375,4 +378,11 @@ if __name__ == "__main__":
     main(wafflestate.initial_state_seven_5)
     main(wafflestate.initial_state_seven_6)
 
-    
+    # Record the end time
+    end_time = time.time()
+
+    # Calculate the total runtime
+    total_runtime = end_time - start_time
+
+    # Print the total runtime
+    print(f"Total runtime: {total_runtime:.2f} seconds")
