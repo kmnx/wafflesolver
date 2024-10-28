@@ -291,7 +291,7 @@ def prep(waffle, initial_state):
         for j in range(waffle.n):
             waffle.state[i][j] = initial_state[i][j]
             all_chars.add(initial_state[i][j][0])
-    # naive wordlist preprocessing, keep only words with chars existing in waffle
+    # wordlist preprocessing, keep only words with chars existing in waffle
     print("len wordlist pre filter", len(wordlist_unfiltered))
     wordlist = []
     for w in wordlist_unfiltered:
@@ -305,7 +305,7 @@ def prep(waffle, initial_state):
 
     # more preprocessing, per line
     candidate_list = get_candidates(waffle, wordlist)
-    print(candidate_list)
+    #print(candidate_list)
     return waffle, candidate_list, wordlist_unfiltered
 
 
@@ -335,20 +335,20 @@ def main(initial_state):
     solvedwaffle.print_state_solved()
     #print("press Enter to continue")
     # input()
-    astar_start = ""
-    astar_end = ""
+    scrambled = ""
+    solution = ""
     for x in range(n):
         for y in range(n):
-            astar_start = astar_start + startstate[x][y][0]
-            astar_end = astar_end + solvedwaffle.state[x][y][0]
-    # astar go!
-    print(astar_start)
-    print(astar_end)
+            scrambled = scrambled + startstate[x][y][0]
+            solution = solution + solvedwaffle.state[x][y][0]
+    # search for ideal path go!
+    print(scrambled)
+    print(solution)
     # deprecated fake A*, which wasn't really A*, more like "custom BFS"
-    # astar.main(astar_start, astar_end)
+    #astar.main(scrambled, solution)
 
     # shiny new cycle decomposition, about 10x faster than the faulty pseudo-A*
-    cycle_decomposition.main(astar_start, astar_end)
+    cycle_decomposition.main(scrambled, solution)
 
 
 if __name__ == "__main__":

@@ -22,18 +22,26 @@ def main(scrambled, solution):
     for i in range(len(scrambled)):
         if scrambled[i] == solution[i]:
             solved_at_start.append(i)
-
+    # how many tiles to solve?
     for i in range(len(scrambled)):
         if scrambled[i] != solution[i]:
             unsolved_tiles += 1
-    mapping = solution_mapping(scrambled, solution, solved_at_start)
-    
 
     if len(solution) == 49:
         success = 20
     elif len(solution) == 25:
         success = 10
+    # to know when a perfect solution is found we need to know the number of required cycles
+    # if a 5x5 waffle has 14 unsolved tiles and can be solved in 10 moves
+    # then 10 moves to solve 14 tiles means 4 double swaps (8 solved) and 6 single swaps (6 solved)
+    # 14 - 10 = 4 double swaps = 4 cycles because each cycle ends with a double swap
     ideal_cycles_number = unsolved_tiles - success
+
+
+    mapping = solution_mapping(scrambled, solution, solved_at_start)
+    
+
+    
     
     # generate starting swaps
     for i in range(len(scrambled)):
@@ -68,26 +76,24 @@ def main(scrambled, solution):
             continue
         
         localcycle = wholecycle[-1]
+        # would be faster to look up the required character at this position
+        # then look up the possible positions in the map
         for index, char in enumerate(solution):
             # character is one we're looking for
             if char == scrambled[localcycle[-1]]:
                 # skip current index if same position
-                if localcycle[-1] == index:
-                    pass
-                else:
+                if localcycle[-1] != index:
+                    
+                
                     # index already checked
                     if index in localcycle:
                         # if index points to beginning of current cycle, open a new cycle
                         if index == localcycle[0]:
-                            whole_frozen = []
-                            for item in wholecycle:
-                                localset = frozenset(item)
-                                whole_frozen.append(localset)
-                            whole_frozen_set = frozenset(whole_frozen)
-                            if whole_frozen_set in cyclopedia:
+                            whole_frozen = frozenset(frozenset(item) for item in wholecycle)
+                            if whole_frozen in cyclopedia:
                                 continue
                             else:
-                                cyclopedia.add(whole_frozen_set)
+                                cyclopedia.add(whole_frozen)
 
                             nextlocalcycle = []
                             for i in range(len(scrambled)):
