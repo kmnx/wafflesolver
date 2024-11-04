@@ -9,7 +9,7 @@ start_time = time.time()
 
 sys.setrecursionlimit(10**6)
 
-
+solvecounter = 0
 class WaffleNode:
     def __init__(self, n):
         self.n = n
@@ -135,6 +135,9 @@ def unsolve(waffle, pos):
 
 
 def solve(waffle, candidate_list):
+    global solvecounter
+    solvecounter += 1
+    print("solvecounter", solvecounter)
     # positions as list to ensure processing order top to bottom, left to right
 
     positions = []
@@ -160,6 +163,7 @@ def solve(waffle, candidate_list):
                     if switchedwaffle:
                         # waffle.print_state_solved()
                         # previous line attempt successful, attempt next line
+                        waffle.print_state()
                         solve(switchedwaffle, candidate_list)
                     if waffle.solved is False:
                         # changed solved markers to unsolved after stepping out of failed recursion
@@ -355,7 +359,7 @@ if __name__ == "__main__":
     # Set n to 5 or 7 depending on waffle size
     # wafflestates are in wafflestate.py
     n = 5
-    main(wafflestate.initial_state_five_1)
+    '''main(wafflestate.initial_state_five_1)
     main(wafflestate.initial_state_five_2)
     main(wafflestate.initial_state_five_3)
     main(wafflestate.initial_state_five_4)
@@ -372,15 +376,15 @@ if __name__ == "__main__":
     main(wafflestate.initial_state_five_15)
     main(wafflestate.initial_state_five_16)
     main(wafflestate.initial_state_five_17)
-    main(wafflestate.initial_state_five_18)
+    main(wafflestate.initial_state_five_18)'''
 
     n = 7
-    main(wafflestate.initial_state_seven_1)
-    main(wafflestate.initial_state_seven_2)
-    main(wafflestate.initial_state_seven_3)
+    #main(wafflestate.initial_state_seven_1)
+    #main(wafflestate.initial_state_seven_2)
+    #main(wafflestate.initial_state_seven_3)
     main(wafflestate.initial_state_seven_4)
-    main(wafflestate.initial_state_seven_5)
-    main(wafflestate.initial_state_seven_6)
+    #main(wafflestate.initial_state_seven_6)
+    ##main(wafflestate.initial_state_seven_5)
 
     # Record the end time
     end_time = time.time()

@@ -37,12 +37,9 @@ def main(scrambled, solution):
     # 14 - 10 = 4 double swaps = 4 cycles because each cycle ends with a double swap
     ideal_cycles_number = unsolved_tiles - success
 
-
     mapping = solution_mapping(scrambled, solution, solved_at_start)
     
 
-    
-    
     # generate starting swaps
     for i in range(len(scrambled)):
         if i not in solved_at_start:
@@ -62,7 +59,7 @@ def main(scrambled, solution):
     while bigstack:
         _, wholecycle = heapq.heappop(bigstack)
         visitedlist = copy.deepcopy(solved_at_start)
-        #print(wholecycle)
+        print(wholecycle)
 
         for cycle in wholecycle:
             for i in cycle:
