@@ -59,7 +59,7 @@ def main(scrambled, solution):
     while bigstack:
         _, wholecycle = heapq.heappop(bigstack)
         visitedlist = copy.deepcopy(solved_at_start)
-        print(wholecycle)
+        #print(wholecycle)
 
         for cycle in wholecycle:
             for i in cycle:
