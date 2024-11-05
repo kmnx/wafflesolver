@@ -58,7 +58,6 @@ def apply_candidate_in_place(waffle, candidate, key, rem_chars):
     return original_state
 def revert_candidate(waffle, original_state, rem_chars):
     for i, j in original_state:
-        #if waffle[i][j] != " ":
         rem_chars.append(waffle[i][j])
         waffle[i][j] = " "
 def recursive_solve(waffle, candidate_list, rem_chars, depth=0):
@@ -143,12 +142,6 @@ def refilter(candidates):
                         for other_candidate in other_candidatelist[1]:
                             if other_candidate[y] not in six:
                                 other_candidatelist[1].remove(other_candidate)
-                    
-                        
-        print("wha")
-            
-
-        #
         
         
     for list in candidates:
@@ -311,7 +304,6 @@ def main(initial_state):
             solution_string += char
     cycle_decomposition.main(scrambled, solution_string)
 
-    #print("Element with Shortest Candidates:", shortest_candidates)
     
 if __name__ == "__main__":
     # Set n to 5 or 7 depending on waffle size
