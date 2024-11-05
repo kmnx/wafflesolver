@@ -8,11 +8,9 @@ from collections import Counter
 
 
 start_time = time.time()
-solve_count = 0
 
 
         
-    return True
 def is_valid_candidate(waffle, candidate, key, rem_chars):
     rem_chars_counter = Counter(rem_chars)
     if key.startswith("i"):
