@@ -350,7 +350,7 @@ def main(initial_state):
     print(scrambled)
     print(solution)
     # deprecated fake A*, which wasn't really A*, more like "custom BFS"
-    # astar.main(scrambled, solution)
+    astar.main(scrambled, solution)
 
     # shiny new cycle decomposition, about 10x faster than the faulty pseudo-A*
     # cycle_decomposition.main(scrambled, solution)

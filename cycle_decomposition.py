@@ -70,6 +70,8 @@ def main(scrambled, solution):
 
             solutionstack.append(wholecycle)
             if len(wholecycle) == ideal_cycles_number:
+                print("Optimal solution:")
+                print(wholecycle)
                 break
 
             continue
@@ -163,7 +165,7 @@ def main(scrambled, solution):
     total_runtime = end_time - start_time
 
     # Print the total runtime
-    print(f"Total runtime: {total_runtime:.2f} seconds")
+    print(f"Total optimal path finding routine runtime: {total_runtime:.2f} seconds")
 
 
 # scrambled = "DBDFAFECBCAE"
