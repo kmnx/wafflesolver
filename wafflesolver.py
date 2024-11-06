@@ -166,6 +166,7 @@ def better_candidates(waffle):
                     if j != index
                 )
             ]
+            #candidates = [w for w in candidates if w[index] != char]
 
         for index in gray_index_list:
             char = waffle[i][index][0]
@@ -213,6 +214,7 @@ def better_candidates(waffle):
                 for w in candidates
                 if any(w[i] == char for i in open_position_list if i != index)
             ]
+            #candidates = [w for w in candidates if w[index] != char]
 
         for index in gray_index_list:
             char = waffle[index][j][0]
