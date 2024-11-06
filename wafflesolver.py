@@ -155,19 +155,18 @@ def better_candidates(waffle):
             for w in candidates
             if all(w[j] == waffle[i][j][0] for j in green_index_list)
         ]
+        
+        
         for index in yellow_must_have_index_list:
-
+            char = waffle[i][index][0]
             candidates = [
                 w
                 for w in candidates
-                if any(
-                    w[j] == waffle[i][index][0]
-                    for j in open_position_list
-                    if j != index
-                )
+                if any(w[j] == char for j in open_position_list if j != index)
             ]
-            #candidates = [w for w in candidates if w[index] != char]
-
+            candidates = [w for w in candidates if w[index] != char]
+            
+                
         for index in gray_index_list:
             char = waffle[i][index][0]
             candidates = [w for w in candidates if w[index] != char]
@@ -212,9 +211,9 @@ def better_candidates(waffle):
             candidates = [
                 w
                 for w in candidates
-                if any(w[i] == char for i in open_position_list if i != index)
+                if any(w[j] == char for j in open_position_list if j != index)
             ]
-            #candidates = [w for w in candidates if w[index] != char]
+            candidates = [w for w in candidates if w[index] != char]
 
         for index in gray_index_list:
             char = waffle[index][j][0]
@@ -231,8 +230,8 @@ def better_candidates(waffle):
     sorted_candidate_list = sorted(
         candidate_list.items(), key=lambda item: len(item[1])
     )
-    # for item in sorted_candidate_list:
-    #    print(len(item[1]))
+    for item in sorted_candidate_list:
+        print(item[0], len(item[1]))
     return simplified_array, sorted_candidate_list, rem_chars
 
 
@@ -284,21 +283,17 @@ def get_candidates(waffle):
         # print("i", i)
         pos = "i" + str(i)
         candidates = wordlist
-
         for j in range(n):
-
             char = waffle[i][j][0]
             colour = waffle[i][j][1]
             if colour == "g":
                 candidates = [w for w in candidates if w[j] == char]
-
             elif colour == "y":
                 # yellow chars not at intersections allow candidates but not at current position
                 if j in range(n)[1::2]:
                     candidates = [
                         w for w in candidates if (char in w) and (w[j] != char)
                     ]
-                    # print("yellowfilter safe:", len(candidates))
 
                 else:
                     # y at intersection might be part of a different word
@@ -373,6 +368,8 @@ def get_candidates(waffle):
     )
     # for item in sorted_candidate_list:
     #    print(len(item[1]))
+    for item in sorted_candidate_list:
+        print(item[0], len(item[1]))
     return simplified_array, sorted_candidate_list, rem_chars
 
 
@@ -381,8 +378,8 @@ def main(initial_state):
     this_run_start_time = time.time()
 
     filter_start_time = time.time()
-
-    waffle, sorted_candidates, rem_chars = better_candidates(initial_state)
+    #waffle, sorted_candidates, rem_chars = simplistic_candidates(initial_state)
+    waffle, sorted_candidates, rem_chars = get_candidates(initial_state)
     filter_end_time = time.time()
 
     # Calculate the total runtime
@@ -439,9 +436,9 @@ if __name__ == "__main__":
     # print("len dict", len(wordlist_unfiltered))
     n = 5
 
-    main(wafflestate.initial_state_five_1)
-    main(wafflestate.initial_state_five_2)
-    main(wafflestate.initial_state_five_3)
+    #main(wafflestate.initial_state_five_1)
+    #main(wafflestate.initial_state_five_2)
+    '''main(wafflestate.initial_state_five_3)
     main(wafflestate.initial_state_five_4)
     main(wafflestate.initial_state_five_5)
     main(wafflestate.initial_state_five_6)
@@ -456,7 +453,7 @@ if __name__ == "__main__":
     main(wafflestate.initial_state_five_15)
     main(wafflestate.initial_state_five_16)
     main(wafflestate.initial_state_five_17)
-    main(wafflestate.initial_state_five_18)
+    main(wafflestate.initial_state_five_18)'''
 
     main(wafflestate.initial_state_seven_1)
     main(wafflestate.initial_state_seven_2)
