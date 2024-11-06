@@ -5,9 +5,11 @@ import wafflestate
 import astar
 import cycle_decomposition
 import time  # Import the time module
+
 start_time = time.time()
 
 sys.setrecursionlimit(10**6)
+
 
 class WaffleNode:
     def __init__(self, n):
@@ -80,7 +82,10 @@ def switch_chars(waffle, candidate, pos):
                         if waffle.state[m][n][0] == wanted_char:
                             if waffle.state[m][n][1] not in ["g", "m"]:
                                 # switch
-                                (waffle.state[m][n][0], waffle.state[i][j][0],) = (
+                                (
+                                    waffle.state[m][n][0],
+                                    waffle.state[i][j][0],
+                                ) = (
                                     waffle.state[i][j][0],
                                     waffle.state[m][n][0],
                                 )
@@ -244,25 +249,25 @@ def get_candidates(waffle, wordlist):
             "yielded",
         ]
         for no in nolist:
-            #print("no:", no)
+            # print("no:", no)
             for idx, candidate in enumerate(candidates):
-                #if candidate in solutions:
-                    #print("solution:", candidate)
+                # if candidate in solutions:
+                # print("solution:", candidate)
                 splitc = [c for c in candidate]
                 if no not in splitc:
-                    #if candidate in solutions:
-                        #print("no not in splitc:", candidate)
+                    # if candidate in solutions:
+                    # print("no not in splitc:", candidate)
                     pass
 
                 else:
                     if no in maybelist:
-                        #if candidate in solutions:
-                            #print("solution:", candidate)
-                            #print("in maybelist")
+                        # if candidate in solutions:
+                        # print("solution:", candidate)
+                        # print("in maybelist")
                         pass
                     else:
-                        #if candidate in solutions:
-                            #print("deleted solution:", candidate)
+                        # if candidate in solutions:
+                        # print("deleted solution:", candidate)
                         del candidates[idx]
 
         candidate_list[pos] = candidates
@@ -305,7 +310,7 @@ def prep(waffle, initial_state):
 
     # more preprocessing, per line
     candidate_list = get_candidates(waffle, wordlist)
-    #print(candidate_list)
+    # print(candidate_list)
     return waffle, candidate_list, wordlist_unfiltered
 
 
@@ -333,7 +338,7 @@ def main(initial_state):
     solvedwaffle = solve(waffle, candidate_list)
     print("\n 🧇 🧇 🧇 Sucess! 🧇 🧇 🧇 \n")
     solvedwaffle.print_state_solved()
-    #print("press Enter to continue")
+    # print("press Enter to continue")
     # input()
     scrambled = ""
     solution = ""
@@ -345,10 +350,10 @@ def main(initial_state):
     print(scrambled)
     print(solution)
     # deprecated fake A*, which wasn't really A*, more like "custom BFS"
-    #astar.main(scrambled, solution)
+    # astar.main(scrambled, solution)
 
     # shiny new cycle decomposition, about 10x faster than the faulty pseudo-A*
-    #cycle_decomposition.main(scrambled, solution)
+    # cycle_decomposition.main(scrambled, solution)
 
 
 if __name__ == "__main__":

@@ -2,13 +2,17 @@ import copy
 import heapq
 import time
 
-def solution_mapping(scrambled, solution,solved_at_start):
+
+def solution_mapping(scrambled, solution, solved_at_start):
     mapping = {}
     for char in set(scrambled):  # Use set to avoid duplicate characters
-        positions = [i for i, s_char in enumerate(solution) if s_char == char and i not in solved_at_start]
+        positions = [
+            i
+            for i, s_char in enumerate(solution)
+            if s_char == char and i not in solved_at_start
+        ]
         mapping[char] = positions
     return mapping
-
 
 
 def main(scrambled, solution):
@@ -38,40 +42,38 @@ def main(scrambled, solution):
     ideal_cycles_number = unsolved_tiles - success
 
     mapping = solution_mapping(scrambled, solution, solved_at_start)
-    
 
     # generate starting swaps
     for i in range(len(scrambled)):
         if i not in solved_at_start:
-            #for index, char in enumerate(solution):
+            # for index, char in enumerate(solution):
             #    if char == scrambled[i]:
             for index in mapping[scrambled[i]]:
-                    localcycle = [i, index]
-                    newwholecycle = [localcycle]
-                    priority = 0
-                    for cycle in newwholecycle:
-                        if len(cycle) == 2:
-                            priority += 2 * 10000
-                        
+                localcycle = [i, index]
+                newwholecycle = [localcycle]
+                priority = 0
+                for cycle in newwholecycle:
+                    if len(cycle) == 2:
+                        priority += 2 * 10000
 
-                    heapq.heappush(bigstack, (-priority, newwholecycle))
+                heapq.heappush(bigstack, (-priority, newwholecycle))
 
     while bigstack:
         _, wholecycle = heapq.heappop(bigstack)
         visitedlist = copy.deepcopy(solved_at_start)
-        #print(wholecycle)
+        # print(wholecycle)
 
         for cycle in wholecycle:
             for i in cycle:
                 visitedlist.append(i)
         if len(visitedlist) == len(solution):
-            
+
             solutionstack.append(wholecycle)
             if len(wholecycle) == ideal_cycles_number:
                 break
 
             continue
-        
+
         localcycle = wholecycle[-1]
         # would be faster to look up the required character at this position
         # then look up the possible positions in the map
@@ -80,13 +82,14 @@ def main(scrambled, solution):
             if char == scrambled[localcycle[-1]]:
                 # skip current index if same position
                 if localcycle[-1] != index:
-                    
-                
+
                     # index already checked
                     if index in localcycle:
                         # if index points to beginning of current cycle, open a new cycle
                         if index == localcycle[0]:
-                            whole_frozen = frozenset(frozenset(item) for item in wholecycle)
+                            whole_frozen = frozenset(
+                                frozenset(item) for item in wholecycle
+                            )
                             if whole_frozen in cyclopedia:
                                 continue
                             else:
@@ -170,8 +173,8 @@ def main(scrambled, solution):
 # solution = "curver o nafootz s eeater"
 # scrambled = "thfeccun h t isistasni n i husitisgl g o ndigceiu"
 # solution = "deficiti i h osustainc h l iunitings n c hsuggest"
-#scrambled = "adotpwet a b rahscocde n e dtpibueen r h rtrgceuh"
-#solution = "chopperh u r eabscondt t d htributee n c aragweed"
+# scrambled = "adotpwet a b rahscocde n e dtpibueen r h rtrgceuh"
+# solution = "chopperh u r eabscondt t d htributee n c aragweed"
 # scrambled = "tcvcsrou o r dbpneares o i itsueiett e g coiehkar"
 # solution = "revisito e e rbandageo t s etouristi r c ocheckup"
 scrambled = "henreubq n i tmerluree e q aduuotado o d yieearnc"
