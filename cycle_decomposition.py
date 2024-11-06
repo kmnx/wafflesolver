@@ -139,7 +139,6 @@ def main(scrambled, solution):
     sorted_solutionstack = sorted(solutionstack, key=len, reverse=True)
 
     for item in sorted_solutionstack:
-        print(item)
         scrambled_list = copy.deepcopy(list(scrambled))
         swapcount = 0
         for cycle in item:
