@@ -28,5 +28,8 @@ initially i tried to solve it using AStar, but Astar is mostly useless as there 
 
 the AStar code is still in there, run wafflesolver_old.py to see it in (in)action. takes up to a minute for some waffles because without good estimation it basically degrades into a dumb BFS.
 
+that was a really fun problem to solve!
+if you enjoy sorting things and pointless optimization and actually read this lmk!
+@knmx___
 
 
