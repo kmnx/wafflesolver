@@ -46,8 +46,6 @@ def main(scrambled, solution):
     # generate starting swaps
     for i in range(len(scrambled)):
         if i not in solved_at_start:
-            # for index, char in enumerate(solution):
-            #    if char == scrambled[i]:
             for index in mapping[scrambled[i]]:
                 localcycle = [i, index]
                 newwholecycle = [localcycle]
@@ -79,12 +77,12 @@ def main(scrambled, solution):
         localcycle = wholecycle[-1]
         # would be faster to look up the required character at this position
         # then look up the possible positions in the map
+        # but we're already at sub-second speed so i don't care any more
         for index, char in enumerate(solution):
             # character is one we're looking for
             if char == scrambled[localcycle[-1]]:
                 # skip current index if same position
                 if localcycle[-1] != index:
-
                     # index already checked
                     if index in localcycle:
                         # if index points to beginning of current cycle, open a new cycle
