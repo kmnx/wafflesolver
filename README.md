@@ -13,7 +13,7 @@ Steps:
 - bruteforce the solution with recursion
 - when the solution is found find the shortest path to the solution using a combination of cycle decomposition and weighted BFS
 
-out to https://github.com/hellpig for his well-documented code for the same problem. it convinced me that cycle decomposition might be the best approach.
+out to https://github.com/hellpig for their well-documented code for the same problem. it convinced me that cycle decomposition might be the best approach.
 
 read this if you love strings and mutating them: https://epubs.siam.org/doi/abs/10.1137/080712969?journalCode=smjcat
 
