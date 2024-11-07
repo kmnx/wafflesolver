@@ -197,7 +197,7 @@ def get_candidates(waffle):
             # remove all words which have the grey character at this position
             candidates = [w for w in candidates if (w[index] != char)]
             # if the grey character is not in the yellow list, it's definitely not in the word at all
-            # required because a unsolved line might have two identical characters, one yellow one grey.
+            # required because an unsolved line might have two identical characters, one yellow one grey.
             if char not in position_dict["yellow_chars"]:
                 candidates = [
                     w
