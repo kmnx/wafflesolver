@@ -305,6 +305,7 @@ def main(initial_state):
             solution_string += char
             printline += char + " "
         print(printline)
+    # the cool part, let's find the shortest path:
     cycle_decomposition.main(scrambled, solution_string)
     this_run_end_time = time.time()
 
