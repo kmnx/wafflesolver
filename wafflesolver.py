@@ -148,7 +148,7 @@ def get_candidates(waffle):
                 candidates = [w for w in candidates if w[j] == char]
             # yellow tile, remove all words with the yellow letter at this position
             elif colour == "y":
-                # bit dirty, keep all words with the same letter at this position if it's not an intersection
+                # bit dirty, remoove all words with the same letter at this position and keep the ones that have it anywhere at all
                 # this also leaves words where the yellow letter might be at a solved position but whatever
                 # it'll be refiltered later, also we only should have candidates with correct greens anyway
                 if j in range(n)[1::2]:
