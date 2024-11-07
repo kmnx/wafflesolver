@@ -18,7 +18,6 @@ class WaffleNode:
         self.attempts = 0
         self.solved = False
         print("innit")
-        # print(self.state)
 
     def print_state(self):
         for i in range(self.n):
@@ -338,8 +337,6 @@ def main(initial_state):
     solvedwaffle = solve(waffle, candidate_list)
     print("\n 🧇 🧇 🧇 Sucess! 🧇 🧇 🧇 \n")
     solvedwaffle.print_state_solved()
-    # print("press Enter to continue")
-    # input()
     scrambled = ""
     solution = ""
     for x in range(n):
@@ -352,7 +349,7 @@ def main(initial_state):
     # deprecated fake A*, which wasn't really A*, more like "custom BFS"
     astar.main(scrambled, solution)
 
-    # shiny new cycle decomposition, about 10x faster than the faulty pseudo-A*
+    # shiny new cycle decomposition, about 100x faster than the faulty pseudo-A*
     # cycle_decomposition.main(scrambled, solution)
 
 

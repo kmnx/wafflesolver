@@ -10,19 +10,21 @@ from collections import Counter
 start_time = time.time()
 solve_counter = 0
 
-
+# helper to check if a candidate word is valid
 def is_valid_candidate(waffle, candidate, key, rem_chars):
     rem_chars_counter = Counter(rem_chars)
     if key.startswith("i"):
         row = int(key[1:])
         for j, char in enumerate(candidate):
+            # there's a letter in the waffle already and it's wrong
             if waffle[row][j] != " " and waffle[row][j] != char:
                 return False
+            # empty space, do we still have required letter available?
             if waffle[row][j] == " ":
                 if rem_chars_counter[char] == 0:
                     return False
                 rem_chars_counter[char] -= 1
-
+    # same but rows
     elif key.startswith("j"):
         col = int(key[1:])
         for i, char in enumerate(candidate):
@@ -35,7 +37,7 @@ def is_valid_candidate(waffle, candidate, key, rem_chars):
 
     return True
 
-
+# helper function to apply a candidate word to the waffle
 def apply_candidate_in_place(waffle, candidate, key, rem_chars):
     if not is_valid_candidate(waffle, candidate, key, rem_chars):
         return False
@@ -59,7 +61,7 @@ def apply_candidate_in_place(waffle, candidate, key, rem_chars):
 
     return original_state
 
-
+# helper function to revert a candidate word from the waffle when stepping back in the recursion
 def revert_candidate(waffle, original_state, rem_chars):
     for i, j in original_state:
         rem_chars.append(waffle[i][j])
@@ -72,21 +74,24 @@ def recursive_solve(waffle, candidate_list, rem_chars, depth=0):
 
     for key, candidates in candidate_list:
         for candidate in candidates:
+            # try to apply the candidate
             original_state = apply_candidate_in_place(waffle, candidate, key, rem_chars)
             if not original_state:
                 continue
-
+            # applying the candidate worked, we must go deeper!
             result = recursive_solve(waffle, candidate_list, rem_chars, depth + 1)
             if result:
                 return result
-
+            # that didn't work, revert the waffle and continue
+            # all this applying and reverting is to avoid expensive deepcopying
             revert_candidate(waffle, original_state, rem_chars)
 
     return None
 
-# this thing is monstrous, you can also get away with simply filtering the wordlist by the starting grid.
+# this wordfilter thing is monstrous, you can also get away with simply filtering the wordlist by the starting grid.
 # keeping candidates with green letters at the right location and removing all with yellow/grey at current location.
-# but filtering makes the seach afterwards much faster, down from 1.6s to 0.4s for solving all included examples
+# but filtering correctly makes the seach afterwards much faster
+# every unfiltered word can increase the bruteforcing time exponentially so it's totally worth it
 def get_candidates(waffle):
 
     simplified_array = []
@@ -120,7 +125,7 @@ def get_candidates(waffle):
         simplified_array.append(simplified_row)
     wordlist = []
 
-    # simple wordlist filtering against available characters
+    # simple first wordlist filtering against available characters
     for w in wordlist_unfiltered:
         for i in range(len(waffle[0])):
             if w[i] not in all_chars:
@@ -133,8 +138,7 @@ def get_candidates(waffle):
     for i in range(n)[0::2]:
         pos = "i" + str(i)
         candidates = wordlist
-        for j in range(n):
-            colour = waffle[i][j][1]
+
             
         for j in range(n):
             char = waffle[i][j][0]
@@ -142,20 +146,24 @@ def get_candidates(waffle):
             # green tile, keep all words with the same letter at this position
             if colour == "g":
                 candidates = [w for w in candidates if w[j] == char]
-            # yellow tile, remove all words with the same letter at this position
+            # yellow tile, remove all words with the yellow letter at this position
             elif colour == "y":
                 # bit dirty, keep all words with the same letter at this position if it's not an intersection
+                # this also leaves words where the yellow letter might be at a solved position but whatever
+                # it'll be refiltered later, also we only should have candidates with correct greens anyway
                 if j in range(n)[1::2]:
                     candidates = [
                         w for w in candidates if (char in w) and (w[j] != char)
                     ]
                 # oh no an intersection, all we can do is remove all words with the same letter at this position
+                # actually we could also filter both the row and column but eh
+                # it would only make sense in the solving part, for filtering it's meaningless
                 else:
                     candidates = [w for w in candidates if (w[j] != char)]
             # grey tile, remove all words with the same letter at this position
             elif colour == "n":
                 candidates = [w for w in candidates if (w[j] != char)]
-        # let's get fancy. track all indices. "must_have_yellow" are yellow tiles that must be in the words
+        # let's get fancy. track all greens, open positions, required yellows, greys. "must_have_yellow" are yellow tiles that must be in the candidate
         position_dict = {"green": [], "must_have_yellow": [], "open": [], "yellow_chars": [], "grey_index_list": []}
         #fill the dictionary
         for j in range(n):
@@ -189,6 +197,7 @@ def get_candidates(waffle):
             # remove all words which have the grey character at this position
             candidates = [w for w in candidates if (w[index] != char)]
             # if the grey character is not in the yellow list, it's definitely not in the word at all
+            # required because a unsolved line might have two identical characters, one yellow one grey.
             if char not in position_dict["yellow_chars"]:
                 candidates = [
                     w
@@ -281,7 +290,6 @@ def main(initial_state):
 
     scrambled = ""
     solution_string = ""
-    #print("Scrambled: ")
     for line in startstate:
         printline = ""
         for char in line:
@@ -302,8 +310,6 @@ def main(initial_state):
 
     # Calculate the total runtime
     this_run_total_runtime = this_run_end_time - this_run_start_time
-
-    # Print the total runtime
     print(f"This run runtime: {this_run_total_runtime:.2f} seconds")
     print("- - - - - - -")
 
@@ -321,9 +327,7 @@ if __name__ == "__main__":
     solutions_file = os.path.join(cwd, "wordlist_7.txt")
     with open(solutions_file) as file:
         wordlist_unfiltered_7 = set(line.strip() for line in file)
-    # print("len dict", len(wordlist_unfiltered))
     wordlist_unfiltered_7 = [w for w in wordlist_unfiltered_7]
-    # print("len dict", len(wordlist_unfiltered))
     n = 5
 
     main(wafflestate.initial_state_five_1)
