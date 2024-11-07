@@ -3,10 +3,12 @@ import heapq
 import time
 import json
 
+
+# helper to create a map of characters to possible solution positions
 def solution_mapping(scrambled, solution, solved_at_start):
     mapping = {}
     # Use set to avoid duplicate characters
-    for char in set(scrambled):  
+    for char in set(scrambled):
         positions = [
             i
             for i, s_char in enumerate(solution)
@@ -15,38 +17,94 @@ def solution_mapping(scrambled, solution, solved_at_start):
         mapping[char] = positions
     return mapping
 
+
 # just a helper to make the solution swaps human readable
 def convert_indices_to_xy(cycle):
     all_moves = []
     n = 0
     for item in cycle:
         n += len(item)
-    n = n-len(cycle)
+    n = n - len(cycle)
     print(n)
     if n == 10:
-        indexmap = {0:"1,1",1:"1,2",2:"1,3",3:"1,4",4:"1,5",
-                    5:"2,1",6:"2,3",7:"2,5",
-                    8:"3,1",9:"3,2",10:"3,3",11:"3,4",12:"3,5",
-                    13:"4,1",14:"4,3",15:"4,5",
-                    16:"5,1",17:"5,2",18:"5,3",19:"5,4",20:"5,5"}
+        indexmap = {
+            0: "1,1",
+            1: "1,2",
+            2: "1,3",
+            3: "1,4",
+            4: "1,5",
+            5: "2,1",
+            6: "2,3",
+            7: "2,5",
+            8: "3,1",
+            9: "3,2",
+            10: "3,3",
+            11: "3,4",
+            12: "3,5",
+            13: "4,1",
+            14: "4,3",
+            15: "4,5",
+            16: "5,1",
+            17: "5,2",
+            18: "5,3",
+            19: "5,4",
+            20: "5,5",
+        }
     elif n == 20:
-        indexmap = {0:"1,1",1:"1,2",2:"1,3",3:"1,4",4:"1,5",5:"1,6",6:"1,7",
-                    7:"2,1",8:"2,3",9:"2,5",10:"2,7",
-                    11:"3,1",12:"3,2",13:"3,3",14:"3,4",15:"3,5",16:"3,6",17:"3,7",
-                    18:"4,1",19:"4,3",20:"4,5",21:"4,7",
-                    22:"5,1",23:"5,2",24:"5,3",25:"5,4",26:"5,5",27:"5,6",28:"5,7",
-                    29:"6,1",30:"6,3",31:"6,5",32:"6,7",
-                    33:"7,1",34:"7,2",35:"7,3",36:"7,4",37:"7,5",38:"7,6",39:"7,7"}
+        indexmap = {
+            0: "1,1",
+            1: "1,2",
+            2: "1,3",
+            3: "1,4",
+            4: "1,5",
+            5: "1,6",
+            6: "1,7",
+            7: "2,1",
+            8: "2,3",
+            9: "2,5",
+            10: "2,7",
+            11: "3,1",
+            12: "3,2",
+            13: "3,3",
+            14: "3,4",
+            15: "3,5",
+            16: "3,6",
+            17: "3,7",
+            18: "4,1",
+            19: "4,3",
+            20: "4,5",
+            21: "4,7",
+            22: "5,1",
+            23: "5,2",
+            24: "5,3",
+            25: "5,4",
+            26: "5,5",
+            27: "5,6",
+            28: "5,7",
+            29: "6,1",
+            30: "6,3",
+            31: "6,5",
+            32: "6,7",
+            33: "7,1",
+            34: "7,2",
+            35: "7,3",
+            36: "7,4",
+            37: "7,5",
+            38: "7,6",
+            39: "7,7",
+        }
     else:
         print("something is wrong, ideal move number is off")
         input()
     for item in cycle:
         item.reverse()
-        for l,index in enumerate(item):
-            all_moves.append([indexmap[index],indexmap[item[l+1]]])
-            if l == len(item)-2:
+        for l, index in enumerate(item):
+            all_moves.append([indexmap[index], indexmap[item[l + 1]]])
+            if l == len(item) - 2:
                 break
     print(all_moves)
+
+
 def main(scrambled, solution):
     scrambled = [c for c in scrambled if c != " "]
     solution = [c for c in solution if c != " "]
@@ -64,11 +122,11 @@ def main(scrambled, solution):
     for i in range(len(scrambled)):
         if scrambled[i] != solution[i]:
             unsolved_tiles += 1
-    #print(len(solution))
+    # print(len(solution))
     # looks weird because i started with strings that included spaces
-    if len(solution) in [40,49]:
+    if len(solution) in [40, 49]:
         success = 20
-    elif len(solution) in [25,21]:
+    elif len(solution) in [25, 21]:
         success = 10
     # to know when a perfect solution is found we need to know the number of required cycles
     # if a 5x5 waffle has 14 unsolved tiles and can be solved in 10 moves
@@ -98,7 +156,6 @@ def main(scrambled, solution):
         _, wholecycle = heapq.heappop(bigstack)
         # visitedlist filled with solved positions to avoid revisiting them
         visitedlist = copy.deepcopy(solved_at_start)
-
 
         for cycle in wholecycle:
             for i in cycle:
@@ -152,13 +209,10 @@ def main(scrambled, solution):
                                         nextlocalcycle = [i, index]
                                         newwholecycle.append(nextlocalcycle)
                                         priority = 0
-                                        cyclesumprio = 0
                                         # magic values! that I made up.
                                         # 2-cycles are the most valuable ones
                                         # the priority determines the order in which the cycles are popped from the heapqueue
-                                        # also more cycles slightly increase the priority to move forward more aggressively
                                         for cycle in newwholecycle:
-                                            cyclesumprio += 100
                                             if len(cycle) == 2:
                                                 priority += 2 * 10000
                                             elif len(cycle) == 3:
@@ -175,9 +229,7 @@ def main(scrambled, solution):
                             newwholecycle = copy.deepcopy(wholecycle)
                             newwholecycle[-1].append(index)
                             priority = 0
-                            cyclesumprio = 0
                             for cycle in newwholecycle:
-                                cyclesumprio += 100
                                 if len(cycle) == 2:
                                     priority += 2 * 10000
                                 elif len(cycle) == 3:
@@ -189,7 +241,7 @@ def main(scrambled, solution):
 
     # Sort bigstack by the number of sublists in each list
     # which is kinda pointless now that I think about it since we know exactly when a perfect solution was found
-    # so it should only contain 1 item. 
+    # so it should only contain 1 item.
     # ah well please sort my item
     sorted_solutionstack = sorted(solutionstack, key=len, reverse=True)
 
@@ -205,7 +257,7 @@ def main(scrambled, solution):
                     scrambled_list[cycle[i]],
                 )
         print("Swaps: ", swapcount)
-        #print("".join(scrambled_list))
+        # print("".join(scrambled_list))
         break
 
     # Record the end time
@@ -235,7 +287,7 @@ solution = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
 if __name__ == "__main__":
     with open("collected_puzzles_and_solutions.json") as f:
         archive_list = json.load(f)
-    #archive_list = brotlidecompress.main()
+    # archive_list = brotlidecompress.main()
     for item in archive_list:
         print(item)
         main(item[0], item[1])

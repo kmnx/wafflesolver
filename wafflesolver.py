@@ -10,6 +10,7 @@ from collections import Counter
 start_time = time.time()
 solve_counter = 0
 
+
 # helper to check if a candidate word is valid
 def is_valid_candidate(waffle, candidate, key, rem_chars):
     rem_chars_counter = Counter(rem_chars)
@@ -37,6 +38,7 @@ def is_valid_candidate(waffle, candidate, key, rem_chars):
 
     return True
 
+
 # helper function to apply a candidate word to the waffle
 def apply_candidate_in_place(waffle, candidate, key, rem_chars):
     if not is_valid_candidate(waffle, candidate, key, rem_chars):
@@ -60,6 +62,7 @@ def apply_candidate_in_place(waffle, candidate, key, rem_chars):
                 rem_chars.remove(char)
 
     return original_state
+
 
 # helper function to revert a candidate word from the waffle when stepping back in the recursion
 def revert_candidate(waffle, original_state, rem_chars):
@@ -87,6 +90,7 @@ def recursive_solve(waffle, candidate_list, rem_chars, depth=0):
             revert_candidate(waffle, original_state, rem_chars)
 
     return None
+
 
 # this wordfilter thing is monstrous, you can also get away with simply filtering the wordlist by the starting grid.
 # keeping candidates with green letters at the right location and removing all with yellow/grey at current location.
@@ -139,7 +143,6 @@ def get_candidates(waffle):
         pos = "i" + str(i)
         candidates = wordlist
 
-            
         for j in range(n):
             char = waffle[i][j][0]
             colour = waffle[i][j][1]
@@ -164,8 +167,14 @@ def get_candidates(waffle):
             elif colour == "n":
                 candidates = [w for w in candidates if (w[j] != char)]
         # let's get fancy. track all greens, open positions, required yellows, greys. "must_have_yellow" are yellow tiles that must be in the candidate
-        position_dict = {"green": [], "must_have_yellow": [], "open": [], "yellow_chars": [], "grey_index_list": []}
-        #fill the dictionary
+        position_dict = {
+            "green": [],
+            "must_have_yellow": [],
+            "open": [],
+            "yellow_chars": [],
+            "grey_index_list": [],
+        }
+        # fill the dictionary
         for j in range(n):
             colour = waffle[i][j][1]
             if colour == "g":
@@ -180,7 +189,7 @@ def get_candidates(waffle):
             else:
                 position_dict["grey_index_list"].append(j)
                 position_dict["open"].append(j)
-            
+
         # go through through all the yellow characters that must be in the word
         for index in position_dict["must_have_yellow"]:
             char = waffle[i][index][0]
@@ -204,7 +213,7 @@ def get_candidates(waffle):
                     for w in candidates
                     if not any(w[j] == char for j in position_dict["open"])
                 ]
-        
+
         candidate_list[pos] = candidates
 
     # filter by columns
@@ -226,7 +235,13 @@ def get_candidates(waffle):
                     candidates = [w for w in candidates if (w[i] != char)]
             elif colour == "n":
                 candidates = [w for w in candidates if (w[i] != char)]
-        position_dict = {"green": [], "must_have_yellow": [], "open": [], "yellow_chars": [], "gray_index_list": []}
+        position_dict = {
+            "green": [],
+            "must_have_yellow": [],
+            "open": [],
+            "yellow_chars": [],
+            "gray_index_list": [],
+        }
         for i in range(n):
             colour = waffle[i][j][1]
             if colour == "g":
@@ -241,8 +256,7 @@ def get_candidates(waffle):
             elif colour == "n":
                 position_dict["gray_index_list"].append(i)
                 position_dict["open"].append(i)
-            
-        
+
         for index in position_dict["must_have_yellow"]:
             char = waffle[index][j][0]
             candidates = [
@@ -261,7 +275,7 @@ def get_candidates(waffle):
                     for w in candidates
                     if not any(w[i] == char for i in position_dict["open"])
                 ]
-             
+
         candidate_list[pos] = candidates
     # sort the candidates by length so the recursion starts with the smallest wordlist
     sorted_candidate_list = sorted(
@@ -277,7 +291,7 @@ def main(initial_state):
     this_run_start_time = time.time()
 
     filter_start_time = time.time()
-    #waffle, sorted_candidates, rem_chars = simplistic_candidates(initial_state)
+    # waffle, sorted_candidates, rem_chars = simplistic_candidates(initial_state)
     waffle, sorted_candidates, rem_chars = get_candidates(initial_state)
     filter_end_time = time.time()
 
