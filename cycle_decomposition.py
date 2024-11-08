@@ -16,11 +16,13 @@ import json
 # so the first cycles we can create are [0,9] and [0,48]
 # next we check those two how they should continue
 # at position 9 should be "u". there's a u at 6 and 28
-# so two new cycles are [0,9,6] and [0,9,28]
+# so two new cycles are [0,9],[9,6] and [0,9],[9,28]
 # if the next index points to the beginning we start a new cycle
 # this continues until every index has been visited
 # the idea is that the more cycles we have, the shorter the path, because the best cycle is one that solves two positions in one move
-# hope that makes sense
+# because to transform dbaca into aabcd
+# you could [[0,2],[2,1],[1,4]] (one cycle)
+# or [0,4],[1,2] (two cycles), each solving two positions at once
 
 # helper to create a map of characters to possible solution positions
 def solution_mapping(scrambled, solution, solved_at_start):
