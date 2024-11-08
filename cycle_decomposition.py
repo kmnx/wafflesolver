@@ -4,6 +4,24 @@ import time
 import json
 
 
+# to maybe make things more clear:
+# waffles are reduced to strings to find the shortest path
+# they look like this:
+# scrambled = "henreubq n i tmerluree e q aduuotado o d yieearnc"
+# solution = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
+# ... but now without spaces
+# cycle decomposition is not hard in theory:
+# first letter is h but we want n. so we look where to find an n
+# there's an n at position 2 (but already correct), 9, and 48
+# so the first cycles we can create are [0,9] and [0,48]
+# next we check those two how they should continue
+# at position 9 should be "u". there's a u at 6 and 28
+# so two new cycles are [0,9,6] and [0,9,28]
+# if the next index points to the beginning we start a new cycle
+# this continues until every index has been visited
+# the idea is that the more cycles we have, the shorter the path, because the best cycle is one that solves two positions in one move
+# hope that makes sense
+
 # helper to create a map of characters to possible solution positions
 def solution_mapping(scrambled, solution, solved_at_start):
     mapping = {}
