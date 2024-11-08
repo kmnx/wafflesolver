@@ -160,6 +160,7 @@ def main(scrambled, solution):
     # generate starting swaps
     for i in range(len(scrambled)):
         if i not in solved_at_start:
+            # go over the map to find indices to create the next possible swaps
             for index in mapping[scrambled[i]]:
                 localcycle = [i, index]
                 newwholecycle = [localcycle]
@@ -224,8 +225,9 @@ def main(scrambled, solution):
                                         (char == scrambled[i])
                                         and i not in visitedlist
                                         and index not in visitedlist
-                                    ):
-
+                                    ):  
+                                        # new cycle so copy the current one and add the next
+                                        # deepcopying because python will otherwise modify the underlying source
                                         newwholecycle = copy.deepcopy(wholecycle)
                                         nextlocalcycle = [i, index]
                                         newwholecycle.append(nextlocalcycle)
