@@ -195,6 +195,7 @@ def main(scrambled, solution):
             continue
 
         localcycle = wholecycle[-1]
+        # iterate over the solution to find next needed character
         # would be faster to look up the required character at this position
         # then look up the possible positions in the map
         # but we're already at sub-second speed so i don't care any more
