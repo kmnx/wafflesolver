@@ -23,7 +23,6 @@ import json
 # because to transform dbaca into aabcd
 # you could [[0,2],[2,1],[1,4]] (one cycle, each move solving 1 position)
 # or [0,4],[1,2] (two cycles), each move solving two positions
-positions at once
 
 # helper to create a map of characters to possible solution positions
 def solution_mapping(scrambled, solution, solved_at_start):
