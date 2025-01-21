@@ -4,14 +4,13 @@ import time
 import json
 
 
-# to maybe make things more clear:
-# waffles are reduced to strings to find the shortest path
+# waffles are reduced to strings to find the shortest path between permutations
 # they look like this:
 # scrambled = "henreubq n i tmerluree e q aduuotado o d yieearnc"
 # solution = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
-# ... but now without spaces
-# cycle decomposition is not hard in theory:
-# first letter is h but we want n. so we look where to find an n
+# (but without spaces)
+# cycle decomposition:
+# first letter in the scrambled string is h, but we want n. so we look where to find an n
 # there's an n at position 2 (but already correct), 9, and 48
 # so the first cycles we can create are [0,9] and [0,48]
 # next we check those two how they should continue
@@ -20,9 +19,12 @@ import json
 # if the next index points to the beginning we start a new cycle
 # this continues until every index has been visited
 # the idea is that the more cycles we have, the shorter the path, because the best cycle is one that solves two positions in one move
-# because to transform dbaca into aabcd
-# you could [[0,2],[2,1],[1,4]] (one cycle, each move solving 1 position)
+# Simplified Example:
+# to transform dbaca into aabcd
+# you could swap [[0,2],[2,1],[1,4]] (one big cycle, each move solving 1 position)
 # or [0,4],[1,2] (two cycles), each move solving two positions
+# so more cycles means less moves to solve the puzzle
+
 
 # helper to create a map of characters to possible solution positions
 def solution_mapping(scrambled, solution, solved_at_start):
@@ -38,7 +40,7 @@ def solution_mapping(scrambled, solution, solved_at_start):
     return mapping
 
 
-# just a helper to make the solution swaps human readable
+# helper to make the solution swaps human readable
 def convert_indices_to_xy(cycle):
     all_moves = []
     n = 0
@@ -131,7 +133,7 @@ def main(scrambled, solution):
     start_time = time.time()
     cyclopedia = set()
     solutionstack = []
-    bigstack = []
+    big_heapqueue = []
     solved_at_start = []
     unsolved_tiles = 0
     # weed out already solved positions
@@ -143,13 +145,13 @@ def main(scrambled, solution):
         if scrambled[i] != solution[i]:
             unsolved_tiles += 1
     # print(len(solution))
-    # looks weird because i started with strings that included spaces
+    # lenght of solution is either 40 or 21. 49 and 25 are the lengths if spaces are included
     if len(solution) in [40, 49]:
         success = 20
-    elif len(solution) in [25, 21]:
+    elif len(solution) in [21, 25]:
         success = 10
-    # to know when a perfect solution is found we need to know the number of required cycles
-    # if a 5x5 waffle has 14 unsolved tiles and can be solved in 10 moves
+    # To know when a perfect solution is found we need to know the number of required cycles.
+    # If a 5x5 waffle has 14 unsolved tiles and can be solved in 10 moves
     # then 10 moves to solve 14 tiles means 4 double swaps (8 solved) and 6 single swaps (6 solved)
     # 14 - 10 = 4 double swaps = 4 cycles because each cycle ends with a double swap
     ideal_cycles_number = unsolved_tiles - success
@@ -170,12 +172,14 @@ def main(scrambled, solution):
                     if len(cycle) == 2:
                         priority += 2 * 10000
                 # and throw em on the heapqueue
-                heapq.heappush(bigstack, (-priority, newwholecycle))
-    # yeah my heapqueue is called bigstack, sue me
-    while bigstack:
+                heapq.heappush(big_heapqueue, (-priority, newwholecycle))
+    # try generating cycles as long as there are still any on the heapqueue
+    while big_heapqueue:
         # pop a cycle
-        _, wholecycle = heapq.heappop(bigstack)
+        _, wholecycle = heapq.heappop(big_heapqueue)
         # visitedlist filled with solved positions to avoid revisiting them
+        # it's in the nature of string permutations (and the point of the puzzle)
+        # that there are many different ways to reach the same state
         visitedlist = copy.deepcopy(solved_at_start)
 
         for cycle in wholecycle:
@@ -225,7 +229,7 @@ def main(scrambled, solution):
                                         (char == scrambled[i])
                                         and i not in visitedlist
                                         and index not in visitedlist
-                                    ):  
+                                    ):
                                         # new cycle so copy the current one and add the next
                                         # deepcopying because python will otherwise modify the underlying source
                                         newwholecycle = copy.deepcopy(wholecycle)
@@ -244,7 +248,7 @@ def main(scrambled, solution):
                                                 priority += 100
                                         # und hepp!
                                         heapq.heappush(
-                                            bigstack, (-priority, newwholecycle)
+                                            big_heapqueue, (-priority, newwholecycle)
                                         )
                     else:
                         # next index still not visited, add it to the current cycle
@@ -260,9 +264,9 @@ def main(scrambled, solution):
                                 elif len(cycle) == 4:
                                     priority += 100
 
-                            heapq.heappush(bigstack, (-priority, newwholecycle))
+                            heapq.heappush(big_heapqueue, (-priority, newwholecycle))
 
-    # Sort bigstack by the number of sublists in each list
+    # Sort solutions by the number of sublists in each list
     # which is kinda pointless now that I think about it since we know exactly when a perfect solution was found
     # so it should only contain 1 item.
     # ah well please sort my item
@@ -311,6 +315,13 @@ if __name__ == "__main__":
     with open("collected_puzzles_and_solutions.json") as f:
         archive_list = json.load(f)
     # archive_list = brotlidecompress.main()
+    start_time = time.time()
     for item in archive_list:
         print(item)
         main(item[0], item[1])
+    end_time = time.time()
+    total_runtime = end_time - start_time
+
+    # Print the total runtime
+    print(f"Total runtime: {total_runtime:.2f} seconds")
+

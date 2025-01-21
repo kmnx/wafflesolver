@@ -192,6 +192,7 @@ bezel
 bible
 bicep
 biddy
+bight
 bigot
 bilge
 billy
@@ -291,6 +292,7 @@ brown
 brunt
 brush
 brute
+bucks
 buddy
 budge
 buggy
@@ -929,6 +931,7 @@ gruel
 gruff
 grunt
 guard
+guano
 guava
 guess
 guest
@@ -2145,6 +2148,7 @@ twirl
 twist
 twixt
 tying
+typed
 udder
 ulcer
 ultra

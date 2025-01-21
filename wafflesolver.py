@@ -5,10 +5,77 @@ import cycle_decomposition
 import time
 import heapq
 from collections import Counter
+import json
 
 
 start_time = time.time()
 solve_counter = 0
+
+
+def line_still_solvable(waffle, key, list, rem_chars):
+
+    for word in list:
+        if key[0] == "i":
+            i = int(key[1])
+            for j in range(len(waffle)):
+                if waffle[i][j] == " ":
+                    if word[j] in rem_chars:
+                        if j == len(waffle) - 1:
+                            return True
+                        else:
+                            continue
+                    else:
+                        break
+                # it's the wrong char
+                elif waffle[i][j] != word[j]:
+                    break
+                else:
+                    if j == len(waffle) - 1:
+                        return True
+                    else:
+                        continue
+
+        else:
+            j = int(key[1])
+            for i in range(len(waffle)):
+                # it's empty
+                if waffle[i][j] == " ":
+                    if word[i] in rem_chars:
+                        if i == len(waffle) - 1:
+                            return True
+                        else:
+                            continue
+                    else:
+                        break
+                # it's the wrong char
+                elif waffle[i][j] != word[i]:
+                    break
+                else:
+                    if i == len(waffle) - 1:
+                        return True
+                    else:
+                        continue
+
+    return False
+
+
+def waffle_still_solvable(waffle, key, candidate_list, rem_chars):
+    # go through the waffle and collect unsolved positions
+    unsolved_lines = set()
+    for i in range(len(waffle))[0::2]:
+        for j in range(0, 4):
+            if waffle[i][j] == " ":
+                unsolved_lines.add("i" + str(i))
+    for j in range(len(waffle))[0::2]:
+        for i in range(0, 4):
+            if waffle[i][j] == " ":
+                unsolved_lines.add("j" + str(j))
+    for key, list in candidate_list:
+        if key in unsolved_lines:
+            if not line_still_solvable(waffle, key, list, rem_chars):
+                return False
+
+    return True
 
 
 # helper to check if a candidate word is valid
@@ -36,6 +103,7 @@ def is_valid_candidate(waffle, candidate, key, rem_chars):
                     return False
                 rem_chars_counter[char] -= 1
 
+    # the candidate is valid
     return True
 
 
@@ -81,12 +149,21 @@ def recursive_solve(waffle, candidate_list, rem_chars, depth=0):
             original_state = apply_candidate_in_place(waffle, candidate, key, rem_chars)
             if not original_state:
                 continue
+
+            # applying the candidate worked, but did it make another candidate list impossible?
+            # cause slight overhead, only helps for pathological cases
+            # like "only 1 green tile and nothing else"
+            if not waffle_still_solvable(waffle, key, candidate_list, rem_chars):
+                revert_candidate(waffle, original_state, rem_chars)
+                continue
+
             # applying the candidate worked, we must go deeper!
             result = recursive_solve(waffle, candidate_list, rem_chars, depth + 1)
             if result:
                 return result
             # that didn't work, revert the waffle and continue
             # all this applying and reverting is to avoid expensive deepcopying
+
             revert_candidate(waffle, original_state, rem_chars)
 
     return None
@@ -329,6 +406,29 @@ def main(initial_state):
     print("- - - - - - -")
 
 
+# incomplete part to convert wafflegame json to arrays, missing correctly placed yellow markers
+"""def json_to_wafflestate(in_scrambled,in_solution):
+    print(in_scrambled)
+    startwaffle = []
+    if len(in_scrambled) == 21:
+        startwaffle = [[],[],[],[],[]]
+        ci = 0
+    
+        for i in range(5):
+            for j in range(5):
+                if [i,j] in [[1,1],[1,3],[3,1],[3,3]]:
+                    startwaffle[i].append([" "," "])
+                else:
+                    letterstate = ""
+                    if in_scrambled[ci] == in_solution[ci]:
+                        letterstate = "g"
+                    else:
+                        letterstate = "n"
+                    startwaffle[i].append([in_scrambled[ci],letterstate])
+                    ci +=1
+    print(startwaffle)"""
+
+
 if __name__ == "__main__":
     # Set n to 5 or 7 depending on waffle size
     # wafflestates are in wafflestate.py
@@ -344,6 +444,14 @@ if __name__ == "__main__":
         wordlist_unfiltered_7 = set(line.strip() for line in file)
     wordlist_unfiltered_7 = [w for w in wordlist_unfiltered_7]
     n = 5
+
+    # incomplete
+    """with open("collected_puzzles_and_solutions.json") as f:
+        archive_list = json.load(f)
+    # archive_list = brotlidecompress.main()
+    for item in archive_list:
+        print(item)
+        wafflestate = main(json_to_wafflestate(item[0],item[1]))"""
 
     main(wafflestate.initial_state_five_1)
     main(wafflestate.initial_state_five_2)
@@ -370,6 +478,7 @@ if __name__ == "__main__":
     main(wafflestate.initial_state_seven_4)
     main(wafflestate.initial_state_seven_5)
     main(wafflestate.initial_state_seven_6)
+    main(wafflestate.initial_state_five_arxiv)
     # Record the end time
     end_time = time.time()
 
