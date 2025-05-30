@@ -12,17 +12,17 @@ import json
 # cycle decomposition:
 # first letter in the scrambled string is h, but we want n. so we look where to find an n
 # there's an n at position 2 (but already correct), 9, and 48
-# so the first cycles we can create are [0,9] and [0,48]
+# so the first swaps we can create are [0,9] and [0,48]
 # next we check those two how they should continue
 # at position 9 should be "u". there's a u at 6 and 28
-# so two new cycles are [0,9],[9,6] and [0,9],[9,28]
-# if the next index points to the beginning we start a new cycle
+# so the new cycles are [0,9],[9,6] and [0,9],[9,28]
+# if the next index points to the beginning, we store it and start a new cycle
 # this continues until every index has been visited
 # the idea is that the more cycles we have, the shorter the path, because the best cycle is one that solves two positions in one move
 # Simplified Example:
 # to transform dbaca into aabcd
-# you could swap [[0,2],[2,1],[1,4]] (one big cycle, each move solving 1 position)
-# or [0,4],[1,2] (two cycles), each move solving two positions
+# you could swap [[0,2],[2,1],[1,4]] (one cycle with 3 swaps, each move solving 1 position)
+# or [0,4],[1,2] (two cycles with 1 swaps each), each move solving two positions
 # so more cycles means less moves to solve the puzzle
 
 
@@ -178,8 +178,7 @@ def main(scrambled, solution):
         # pop a cycle
         _, wholecycle = heapq.heappop(big_heapqueue)
         # visitedlist filled with solved positions to avoid revisiting them
-        # it's in the nature of string permutations (and the point of the puzzle)
-        # that there are many different ways to reach the same state
+        # as there are many different paths to reach the same state
         visitedlist = copy.deepcopy(solved_at_start)
 
         for cycle in wholecycle:
@@ -188,7 +187,6 @@ def main(scrambled, solution):
                 visitedlist.append(i)
         # we visited everything so we must be done
         if len(visitedlist) == len(solution):
-
             solutionstack.append(wholecycle)
             # for the wafflegame.com we already know the number of ideal cycles
             if len(wholecycle) == ideal_cycles_number:

@@ -6,6 +6,10 @@ import astar
 import cycle_decomposition
 import time  # Import the time module
 
+
+# First attempt, recursive solution with lots of overhead
+# it works, but is relatively slow
+
 start_time = time.time()
 
 sys.setrecursionlimit(10**6)
