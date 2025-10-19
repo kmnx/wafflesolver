@@ -15,6 +15,7 @@ solve_counter = 0
 # This version works relatively well, but despite lots of unnecessary checks and complexity
 # it still struggles with pathological cases like "only 1 green tile and nothing else"
 
+
 def line_still_solvable(waffle, key, list, rem_chars):
 
     for word in list:
@@ -156,7 +157,7 @@ def recursive_solve(waffle, candidate_list, rem_chars, depth=0):
             # applying the candidate worked, but did it make another candidate list impossible?
             # cause slight overhead, only helps for pathological cases
             # like "only 1 green tile and nothing else"
-            #if not waffle_still_solvable(waffle, key, candidate_list, rem_chars):
+            # if not waffle_still_solvable(waffle, key, candidate_list, rem_chars):
             #    revert_candidate(waffle, original_state, rem_chars)
             #    continue
 
@@ -219,7 +220,10 @@ def get_candidates(waffle):
                     wordlist.append(w)
 
     # create sets of local yellow characters at each intersection
-    y_chars = [[set() if i % 2 == 0 and j % 2 == 0 else None for j in range(n)] for i in range(n)]
+    y_chars = [
+        [set() if i % 2 == 0 and j % 2 == 0 else None for j in range(n)]
+        for i in range(n)
+    ]
     for i in range(n)[0::2]:
         for j in range(n)[0::2]:
             for k in range(n):
@@ -229,38 +233,48 @@ def get_candidates(waffle):
                 if waffle[l][j][1] == "y":
                     y_chars[i][j].add(waffle[l][j][0])
     # create sets of impossible characters at each intersection
-    #print(n, "n")
-    impossible_chars = [[set() if i % 2 == 0 and j % 2 == 0 else None for j in range(n)] for i in range(n)]
-    
+    # print(n, "n")
+    impossible_chars = [
+        [set() if i % 2 == 0 and j % 2 == 0 else None for j in range(n)]
+        for i in range(n)
+    ]
+
     for i in range(n)[0::2]:
         for j in range(n)[0::2]:
             localchar = waffle[i][j][0]
             localcolour = waffle[i][j][1]
-            #print("we're at", i, j, "localchar", localchar)
+            # print("we're at", i, j, "localchar", localchar)
             if localcolour == "g":
                 pass
-            
+
             else:
                 if localcolour == "n" and localchar not in y_chars[i][j]:
                     impossible_chars[i][j].add(localchar)
                 for k in range(n):
-                    
-                    #print(i,k, waffle[i][k][0],localchar)
-                    #print(waffle[i][k][1] == "n")
-                    #print(waffle[i][k][0] != localchar)
-                    if waffle[i][k][1] == "n" and waffle[i][k][0] != localchar and waffle[i][k][0] not in y_chars[i][j]:
-                        #print("adding", waffle[i][k][0], "to", i, j)
+
+                    # print(i,k, waffle[i][k][0],localchar)
+                    # print(waffle[i][k][1] == "n")
+                    # print(waffle[i][k][0] != localchar)
+                    if (
+                        waffle[i][k][1] == "n"
+                        and waffle[i][k][0] != localchar
+                        and waffle[i][k][0] not in y_chars[i][j]
+                    ):
+                        # print("adding", waffle[i][k][0], "to", i, j)
                         impossible_chars[i][j].add(waffle[i][k][0])
                 for l in range(n):
-                    #print(l,j,waffle[l][j][0],localchar)
-                    #print(waffle[l][j][1] == "n")
-                    #print(waffle[l][j][0] != localchar)
+                    # print(l,j,waffle[l][j][0],localchar)
+                    # print(waffle[l][j][1] == "n")
+                    # print(waffle[l][j][0] != localchar)
 
-                    if waffle[l][j][1] == "n" and waffle[l][j][0] != localchar and waffle[l][j][0] not in y_chars[i][j]:
-                        #print("adding", waffle[l][j][0], "to", i, j)
+                    if (
+                        waffle[l][j][1] == "n"
+                        and waffle[l][j][0] != localchar
+                        and waffle[l][j][0] not in y_chars[i][j]
+                    ):
+                        # print("adding", waffle[l][j][0], "to", i, j)
                         impossible_chars[i][j].add(waffle[l][j][0])
-    #print("impossible chars", impossible_chars)
-
+    # print("impossible chars", impossible_chars)
 
     # filter by rows
     can_start = time.time()
@@ -419,7 +433,7 @@ def get_candidates(waffle):
     for key, candidates in sorted_candidate_list:
         print(key, len(candidates))
     can_end = time.time()
-    print("Candidate creation time:", can_end-can_start)
+    print("Candidate creation time:", can_end - can_start)
     return simplified_array, sorted_candidate_list, rem_chars
 
 
@@ -441,8 +455,8 @@ def main(initial_state):
 
     solution = recursive_solve(waffle, sorted_candidates, rem_chars)
     rec_end_time = time.time()
-    print("rec time:", rec_end_time-rec_start_time)
-    
+    print("rec time:", rec_end_time - rec_start_time)
+
     print(f"Total filter runtime: {filter_total_runtime:.2f} seconds")
     print("recursive_solve done")
 
@@ -472,7 +486,7 @@ def main(initial_state):
     print(f"This run runtime: {this_run_total_runtime:.2f} seconds")
     print("- - - - - - -")
     end_main_time = time.time()
-    print("main time:", end_main_time-start_main_time)
+    print("main time:", end_main_time - start_main_time)
 
 
 # incomplete part to convert wafflegame json to arrays, missing correctly placed yellow markers
@@ -521,7 +535,7 @@ if __name__ == "__main__":
     for item in archive_list:
         print(item)
         wafflestate = main(json_to_wafflestate(item[0],item[1]))"""
-    
+
     main(wafflestate.initial_state_five_1)
     main(wafflestate.initial_state_five_4)
     main(wafflestate.initial_state_five_3)
@@ -546,8 +560,8 @@ if __name__ == "__main__":
     main(wafflestate.initial_state_seven_4)
     main(wafflestate.initial_state_seven_5)
     main(wafflestate.initial_state_seven_6)
-    
-    #main(wafflestate.initial_state_five_arxiv)
+
+    # main(wafflestate.initial_state_five_arxiv)
     # Record the end time
     end_time = time.time()
 

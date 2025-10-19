@@ -11,7 +11,7 @@ from collections import Counter
 
 
 def main(waffle):
-    #print("Initial state:", waffle)
+    # print("Initial state:", waffle)
     start_main_time = time.time()
     n = len(waffle)
     if n == 5:
@@ -21,8 +21,8 @@ def main(waffle):
 
     solved_waffle = solve(waffle, wordlist_unfiltered)
     end_main_time = time.time()
-    print("main time:", end_main_time-start_main_time)
-    scrambled = "" 
+    print("main time:", end_main_time - start_main_time)
+    scrambled = ""
     solution_string = ""
     for line in waffle:
         printline = ""
@@ -42,15 +42,17 @@ def main(waffle):
     # the actually interesting part, finding the least amount of swaps through cycle decomposition
     cycle_decomposition.main(scrambled, solution_string)
 
-    
-def recursive_solve(waffle_skeleton, candidates, rem_chars, n, sorted_candidate_indices, depth=0):
-    
+
+def recursive_solve(
+    waffle_skeleton, candidates, rem_chars, n, sorted_candidate_indices, depth=0
+):
+
     # base case: solved if all remaining letters are used up
     if all(v == 0 for v in rem_chars.values()):
         return [row[:] for row in waffle_skeleton]  # Return a copy of the solved board
     # select candidate list based on sorted_candidate_indices
     length, orientation, index = sorted_candidate_indices[depth]
-    
+
     # orientation: 0=row, 1=col
     for word in candidates[orientation][index]:
         # track changes for rollback
@@ -82,7 +84,14 @@ def recursive_solve(waffle_skeleton, candidates, rem_chars, n, sorted_candidate_
                     break
 
         if can_apply:
-            result = recursive_solve(waffle_skeleton, candidates, rem_chars, n, sorted_candidate_indices, depth+1)
+            result = recursive_solve(
+                waffle_skeleton,
+                candidates,
+                rem_chars,
+                n,
+                sorted_candidate_indices,
+                depth + 1,
+            )
             if result:
                 return result
 
@@ -92,9 +101,9 @@ def recursive_solve(waffle_skeleton, candidates, rem_chars, n, sorted_candidate_
             waffle_skeleton[i][j] = prev
 
     return None  # no solution found at this branch
-    
 
-def solve(waffle,wordlist_unfiltered):
+
+def solve(waffle, wordlist_unfiltered):
     # Set up the skeleton waffle with only the green letters
     # and empty spaces for the rest.
     # Collect both the remaining and all existing characters.
@@ -129,7 +138,7 @@ def solve(waffle,wordlist_unfiltered):
 
     # Initialize a 2D array of sets for possible characters at each position
     position_chars = [[set() for _ in range(n)] for _ in range(n)]
-    
+
     for i in range(n):
         for j in range(n):
             # green means there's only 1 possible character
@@ -144,7 +153,7 @@ def solve(waffle,wordlist_unfiltered):
                 if waffle[i][j][1] == "y":
                     if waffle[i][j][0] in temp_possible_chars_hori:
                         temp_possible_chars_hori.remove(waffle[i][j][0])
-                
+
                 # find yellows and store them to account for cases of the same letter appearing 2 times as yellow and grey
                 # check horizontal
                 if i % 2 == 0:
@@ -153,7 +162,10 @@ def solve(waffle,wordlist_unfiltered):
                         if waffle[i][k][1] == "y":
                             yellows_in_line.add(waffle[i][k][0])
                     for k in range(n):
-                        if waffle[i][k][1] == "n" and waffle[i][k][0] not in yellows_in_line:
+                        if (
+                            waffle[i][k][1] == "n"
+                            and waffle[i][k][0] not in yellows_in_line
+                        ):
                             if waffle[i][k][0] in temp_possible_chars_hori:
                                 temp_possible_chars_hori.remove(waffle[i][k][0])
 
@@ -164,13 +176,18 @@ def solve(waffle,wordlist_unfiltered):
                         if waffle[k][j][1] == "y":
                             yellows_in_line.add(waffle[k][j][0])
                     for k in range(n):
-                        if waffle[k][j][1] == "n" and waffle[k][j][0] not in yellows_in_line:
+                        if (
+                            waffle[k][j][1] == "n"
+                            and waffle[k][j][0] not in yellows_in_line
+                        ):
                             if waffle[k][j][0] in temp_possible_chars_vert:
                                 temp_possible_chars_vert.remove(waffle[k][j][0])
                 # Add the remaining characters to the position
-                position_chars[i][j] = set(temp_possible_chars_vert.intersection(temp_possible_chars_hori))
+                position_chars[i][j] = set(
+                    temp_possible_chars_vert.intersection(temp_possible_chars_hori)
+                )
 
-    candidates = [ [set() for _ in range(n)] for _ in range(2) ]
+    candidates = [[set() for _ in range(n)] for _ in range(2)]
     # candidates for each row
     for i in range(n)[0::2]:
         must_have_yellow = {}
@@ -178,7 +195,9 @@ def solve(waffle,wordlist_unfiltered):
         slimmed_list = wordlist_unfiltered
 
         for j in range(n):
-            slimmed_list = [word for word in slimmed_list if word[j] in position_chars[i][j]]
+            slimmed_list = [
+                word for word in slimmed_list if word[j] in position_chars[i][j]
+            ]
 
             if waffle[i][j][1] != "g":
                 open_positions.append(j)
@@ -193,19 +212,24 @@ def solve(waffle,wordlist_unfiltered):
         # check wordlist against yellow chars that must appear in the word
         if must_have_yellow:
             for char in must_have_yellow:
-                slimmed_list = [word for word in slimmed_list if any(word[pos] == char for pos in must_have_yellow[char] )]
-                
-          
+                slimmed_list = [
+                    word
+                    for word in slimmed_list
+                    if any(word[pos] == char for pos in must_have_yellow[char])
+                ]
+
         candidates[0][i] = slimmed_list
     # candidates for each column
     for j in range(n)[0::2]:
         must_have_yellow = {}
         open_positions = []
         slimmed_list = wordlist_unfiltered
-        
+
         for i in range(n):
-            slimmed_list = [word for word in slimmed_list if word[i] in position_chars[i][j]]
-      
+            slimmed_list = [
+                word for word in slimmed_list if word[i] in position_chars[i][j]
+            ]
+
             if waffle[i][j][1] != "g":
                 open_positions.append(i)
         # get must have yellows
@@ -216,28 +240,33 @@ def solve(waffle,wordlist_unfiltered):
                 for o in open_positions:
                     if o != i:
                         must_have_yellow[waffle[i][j][0]].add(o)
-  
+
         if must_have_yellow:
             for char in must_have_yellow:
-                slimmed_list = [word for word in slimmed_list if any(word[pos] == char for pos in must_have_yellow[char] )]
-                
-        candidates[1][j] = slimmed_list
+                slimmed_list = [
+                    word
+                    for word in slimmed_list
+                    if any(word[pos] == char for pos in must_have_yellow[char])
+                ]
 
+        candidates[1][j] = slimmed_list
 
     # update the possible chars at intersections from the candidates
     update_position_chars(position_chars, candidates, n)
     # update candidates based on updated position chars
-    updated_candidates = update_candidates(position_chars,candidates,n)
-    
+    updated_candidates = update_candidates(position_chars, candidates, n)
+
     # sort candidate lists by length for faster recursive solving
     sorted_candidate_indices = []
-    for orientation,candidate_list in enumerate(candidates):
+    for orientation, candidate_list in enumerate(candidates):
         for index, wordlist in enumerate(candidate_list):
             if len(wordlist) != 0:
-                sorted_candidate_indices.append([len(wordlist),orientation,index])
-    
+                sorted_candidate_indices.append([len(wordlist), orientation, index])
+
     sorted_candidate_indices = sorted(sorted_candidate_indices)
-    solved_waffle = recursive_solve(simplified_array, updated_candidates, rem_chars, n, sorted_candidate_indices)
+    solved_waffle = recursive_solve(
+        simplified_array, updated_candidates, rem_chars, n, sorted_candidate_indices
+    )
 
     return solved_waffle
 
@@ -245,16 +274,19 @@ def solve(waffle,wordlist_unfiltered):
 def update_position_chars(position_chars, candidates, n):
     # Update position_chars based on candidate words
     for i in range(n)[0::2]:
-        for j in range(n)[0::2]: 
+        for j in range(n)[0::2]:
             temp_possible_chars_vert = set()
             temp_possible_chars_hori = set()
             for word in candidates[0][i]:
                 temp_possible_chars_hori.add(word[j])
             for word in candidates[1][j]:
                 temp_possible_chars_vert.add(word[i])
-                         
-            position_chars[i][j] = set(temp_possible_chars_vert.intersection(temp_possible_chars_hori))
+
+            position_chars[i][j] = set(
+                temp_possible_chars_vert.intersection(temp_possible_chars_hori)
+            )
     return position_chars
+
 
 def update_candidates(position_chars, candidates, n):
     # Update candidates based on position_chars
@@ -263,14 +295,18 @@ def update_candidates(position_chars, candidates, n):
             pass
         else:
             for j in range(n):
-                candidates[0][i] = [word for word in candidates[0][i] if word[j] in position_chars[i][j]]
-    
+                candidates[0][i] = [
+                    word for word in candidates[0][i] if word[j] in position_chars[i][j]
+                ]
+
     for j in range(n)[0::2]:
         if len(candidates[1][j]) == 1:
             pass
         else:
             for i in range(n):
-                candidates[1][j] = [word for word in candidates[1][j] if word[i] in position_chars[i][j]]
+                candidates[1][j] = [
+                    word for word in candidates[1][j] if word[i] in position_chars[i][j]
+                ]
     return candidates
 
 
