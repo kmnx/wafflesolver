@@ -168,9 +168,7 @@ def main(scrambled, solution):
                 newwholecycle = [localcycle]
                 priority = 0
                 # 2-cycles are the most valuable ones, so they get the highest priority
-                for cycle in newwholecycle:
-                    if len(cycle) == 2:
-                        priority += 2 * 10000
+                priority += 2 * 10000
                 # and throw em on the heapqueue
                 heapq.heappush(big_heapqueue, (-priority, newwholecycle))
     # try generating cycles as long as there are still any on the heapqueue

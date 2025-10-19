@@ -5,6 +5,9 @@ from warnings import warn
 # this was my first attempt
 # it's not AStar
 # don't look at it
+# you will go blind
+
+
 class Node:
     """A node class for A* Pathfinding"""
 
