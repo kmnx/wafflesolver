@@ -146,7 +146,6 @@ def main(scrambled, solution):
     for i in range(len(scrambled)):
         if scrambled[i] != solution[i]:
             unsolved_tiles += 1
-    # print(len(solution))
     # lenght of solution is either 40 or 21. 49 and 25 are the lengths if spaces are included
     if len(solution) in [40, 49]:
         success = 20
@@ -163,22 +162,23 @@ def main(scrambled, solution):
 
     # generate starting swaps
     for i in unvisitedlist:
-            # go over the map to find indices to create the next possible swaps
+        # go over the map to find indices to create the next possible swaps
+        for index in mapping[scrambled[i]]:
+            next_visitedlist = visitedlist.copy()
+            localcycle = [i, index]
+            newwholecycle = [localcycle]
+            priority = 0
+            priority -= 2 * 10000
+            next_visitedlist.append(i)
+            next_visitedlist.append(index)
+            heapq.heappush(
+                big_heapqueue, (priority, [newwholecycle, next_visitedlist])
+            )
 
-            for index in mapping[scrambled[i]]:
-                next_visitedlist = visitedlist.copy()
-                localcycle = [i, index]
-                newwholecycle = [localcycle]
-                priority = 0
-                priority += 2 * 10000
-                next_visitedlist.append(i)
-                next_visitedlist.append(index)
-                heapq.heappush(
-                    big_heapqueue, (-priority, [newwholecycle, next_visitedlist])
-                )
     # try generating cycles as long as there are still any on the heapqueue
     while big_heapqueue:
-        _, heap_item = heapq.heappop(big_heapqueue)
+        #print("Heapqueue size:", len(big_heapqueue))
+        priority, heap_item = heapq.heappop(big_heapqueue)
         wholecycle, visitedlist = heap_item
 
         # we visited everything so we must be done
@@ -198,6 +198,7 @@ def main(scrambled, solution):
         # lookup next required character positions
         next_possible_indices = mapping[scrambled[localcycle[-1]]]
         for index in next_possible_indices:
+            # case 1: end of cycle points to start, finish and open a new one
             if index == localcycle[0]:
                 # make hashable sets to avoid visiting the same cycle twice
                 whole_frozen = frozenset(frozenset(item) for item in wholecycle)
@@ -211,7 +212,6 @@ def main(scrambled, solution):
                     for index in mapping[scrambled[i]]:
                         if (index not in visitedlist) and (i not in visitedlist):
                             # new cycle so copy the current one and add the next
-                            # deepcopying because python will otherwise modify the underlying source
                             newwholecycle = wholecycle.copy()
                             nextlocalcycle = [i, index]
                             newwholecycle.append(nextlocalcycle)
@@ -221,46 +221,54 @@ def main(scrambled, solution):
                             next_visitedlist.append(index)
 
                             # magic values!
-                            # 2-cycles are the most valuable ones
+                            # 2-cycles are the most valuable ones and get lowest priority
                             # priority determines the order in which the cycles are popped from the heapqueue
                             for cycle in newwholecycle:
                                 if len(cycle) == 2:
-                                    priority += 2 * 10000
-                                elif len(cycle) == 3:
-                                    priority += 1000
+                                    priority -= 2 * 100000
+                                if len(cycle) == 3:
+                                    priority -= 1000
                                 elif len(cycle) == 4:
-                                    priority += 100
+                                    priority -= 100
+                                elif len(cycle) == 5:
+                                    priority -= 10
+                                elif len(cycle) == 6:
+                                    priority -= 1
+                            
                             # und hepp!
                             heapq.heappush(
                                 big_heapqueue,
-                                (-priority, [newwholecycle, next_visitedlist]),
-                            )
+                                (priority, [newwholecycle, next_visitedlist]),
+                        )
             else:
                 # next index still not visited, add it to the current cycle
                 if index not in visitedlist:
                     newwholecycle = copy.deepcopy(wholecycle)
-                    newwholecycle[-1].append(index)
-                    priority = 0
+                    newwholecycle[-1].append(index)                    
                     next_visitedlist = visitedlist.copy()
                     next_visitedlist.append(index)
+                    priority = 0
                     for cycle in newwholecycle:
                         if len(cycle) == 2:
-                            priority += 2 * 10000
+                            priority -= 2 * 100000
                         elif len(cycle) == 3:
-                            priority += 1000
+                            priority -= 1000
                         elif len(cycle) == 4:
-                            priority += 100
+                            priority -= 100
+                        elif len(cycle) == 5:
+                            priority -= 10
+                        elif len(cycle) == 6:
+                            priority -= 1
+                    
                     heapq.heappush(
-                        big_heapqueue, (-priority, [newwholecycle, next_visitedlist])
+                        big_heapqueue, (priority, [newwholecycle, next_visitedlist])
                     )
 
     # Sort solutions by the number of sublists in each list
-    # which is kinda pointless now that I think about it since we know exactly when a perfect solution was found
-    # so it should only contain 1 item.
-    # ah well please sort my item
-    sorted_solutionstack = sorted(solutionstack, key=len, reverse=True)
 
-    for item in sorted_solutionstack:
+    #sorted_solutionstack = sorted(solutionstack, key=len, reverse=True)
+
+    for item in solutionstack:
         scrambled_list = copy.deepcopy(list(scrambled))
         swapcount = 0
         for cycle in item:
