@@ -135,11 +135,13 @@ def main(scrambled, solution):
     solutionstack = []
     big_heapqueue = []
     visitedlist = []
+    unvisitedlist = []
     unsolved_tiles = 0
     # weed out already solved positions
     for i in range(len(scrambled)):
         if scrambled[i] == solution[i]:
             visitedlist.append(i)
+    unvisitedlist = [i for i in range(len(scrambled)) if i not in visitedlist]
     # how many tiles to solve?
     for i in range(len(scrambled)):
         if scrambled[i] != solution[i]:
@@ -160,8 +162,7 @@ def main(scrambled, solution):
     mapping = solution_mapping(scrambled, solution, visitedlist)
 
     # generate starting swaps
-    for i in range(len(scrambled)):
-        if i not in visitedlist:
+    for i in unvisitedlist:
             # go over the map to find indices to create the next possible swaps
 
             for index in mapping[scrambled[i]]:
@@ -169,9 +170,7 @@ def main(scrambled, solution):
                 localcycle = [i, index]
                 newwholecycle = [localcycle]
                 priority = 0
-                # 2-cycles are the most valuable ones, so they get the highest priority
                 priority += 2 * 10000
-                # and throw em on the heapqueue
                 next_visitedlist.append(i)
                 next_visitedlist.append(index)
                 heapq.heappush(
@@ -213,7 +212,7 @@ def main(scrambled, solution):
                         if (index not in visitedlist) and (i not in visitedlist):
                             # new cycle so copy the current one and add the next
                             # deepcopying because python will otherwise modify the underlying source
-                            newwholecycle = copy.deepcopy(wholecycle)
+                            newwholecycle = wholecycle.copy()
                             nextlocalcycle = [i, index]
                             newwholecycle.append(nextlocalcycle)
                             priority = 0
