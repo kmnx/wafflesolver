@@ -5,7 +5,7 @@ import json
 
 
 # waffles are reduced to strings to find the shortest path between permutations
-# they look like this:
+# like this:
 # scrambled = "henreubq n i tmerluree e q aduuotado o d yieearnc"
 # solution = "nunneryo u q imarqueea t a ldoubtedi r o echeered"
 # (but without spaces)
@@ -119,7 +119,7 @@ def convert_indices_to_xy(cycle):
         print("something is wrong, ideal move number is off")
         input()
     for item in cycle:
-        item.reverse()
+        item = item[::-1]  # reverse tuple
         for l, index in enumerate(item):
             all_moves.append([indexmap[index], indexmap[item[l + 1]]])
             if l == len(item) - 2:
@@ -165,7 +165,8 @@ def main(scrambled, solution):
         # go over the map to find indices to create the next possible swaps
         for index in mapping[scrambled[i]]:
             next_visitedlist = visitedlist.copy()
-            localcycle = [i, index]
+            #localcycle = [i, index]
+            localcycle = (i, index)
             newwholecycle = [localcycle]
             priority = 0
             priority -= 2 * 10000
@@ -201,20 +202,22 @@ def main(scrambled, solution):
             # case 1: end of cycle points to start, finish and open a new one
             if index == localcycle[0]:
                 # make hashable sets to avoid visiting the same cycle twice
-                whole_frozen = frozenset(frozenset(item) for item in wholecycle)
+                whole_frozen = frozenset(wholecycle)
                 if whole_frozen in cyclopedia:
                     continue
                 else:
                     cyclopedia.add(whole_frozen)
                 # new cycle lets go
-                nextlocalcycle = []
+                #nextlocalcycle = []
                 for i in range(len(scrambled)):
                     for index in mapping[scrambled[i]]:
                         if (index not in visitedlist) and (i not in visitedlist):
                             # new cycle so copy the current one and add the next
                             newwholecycle = wholecycle.copy()
-                            nextlocalcycle = [i, index]
-                            newwholecycle.append(nextlocalcycle)
+                            #nextlocalcycle = (i, index)
+                            #newwholecycle.append(nextlocalcycle)
+                            newlocalcycle = (i, index)
+                            newwholecycle.append(newlocalcycle)
                             priority = 0
                             next_visitedlist = visitedlist.copy()
                             next_visitedlist.append(i)
@@ -225,7 +228,7 @@ def main(scrambled, solution):
                             # priority determines the order in which the cycles are popped from the heapqueue
                             for cycle in newwholecycle:
                                 if len(cycle) == 2:
-                                    priority -= 2 * 100000
+                                    priority -= 2 * 10000
                                 if len(cycle) == 3:
                                     priority -= 1000
                                 elif len(cycle) == 4:
@@ -243,14 +246,15 @@ def main(scrambled, solution):
             else:
                 # next index still not visited, add it to the current cycle
                 if index not in visitedlist:
-                    newwholecycle = copy.deepcopy(wholecycle)
-                    newwholecycle[-1].append(index)                    
+                    newwholecycle = wholecycle.copy()
+                    #newwholecycle[-1].append(index) 
+                    newwholecycle[-1] = localcycle + (index,)
                     next_visitedlist = visitedlist.copy()
                     next_visitedlist.append(index)
                     priority = 0
                     for cycle in newwholecycle:
                         if len(cycle) == 2:
-                            priority -= 2 * 100000
+                            priority -= 2 * 10000
                         elif len(cycle) == 3:
                             priority -= 1000
                         elif len(cycle) == 4:
@@ -264,15 +268,14 @@ def main(scrambled, solution):
                         big_heapqueue, (priority, [newwholecycle, next_visitedlist])
                     )
 
-    # Sort solutions by the number of sublists in each list
-
-    #sorted_solutionstack = sorted(solutionstack, key=len, reverse=True)
-
+    # verify solution
+    '''
     for item in solutionstack:
         scrambled_list = copy.deepcopy(list(scrambled))
         swapcount = 0
         for cycle in item:
             swapcount += len(cycle) - 1
+            cycle = list(cycle)
             cycle.reverse()
             for i in range(len(cycle) - 1):
                 scrambled_list[cycle[i]], scrambled_list[cycle[i + 1]] = (
@@ -280,8 +283,10 @@ def main(scrambled, solution):
                     scrambled_list[cycle[i]],
                 )
         print("Swaps: ", swapcount)
-        # print("".join(scrambled_list))
+        print("Expected solution:", "".join(solution))
+        print("Computed solution:", "".join(scrambled_list))
         break
+    '''
 
     # Record the end time
     end_time = time.time()
