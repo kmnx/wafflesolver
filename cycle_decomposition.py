@@ -191,8 +191,8 @@ def main(scrambled, solution):
         # print("Current Heap Size:", len(big_heapqueue))
         priority, heap_item = heapq.heappop(big_heapqueue)
         whole_cycle, visited_mask = heap_item
-        #print(visited_mask)
-        #print("Heap Size:", len(big_heapqueue))
+        # print(visited_mask)
+        # print("Heap Size:", len(big_heapqueue))
         push_batch = []
         total_heap_pops += 1
 
@@ -206,7 +206,6 @@ def main(scrambled, solution):
                 print(whole_cycle)
                 convert_indices_to_xy(whole_cycle, max_moves)
                 break
-                
 
             continue
 
@@ -237,7 +236,7 @@ def main(scrambled, solution):
                             prio_mod = next_priority - 20000
                             next_whole_cycle = whole_cycle + ((i, idx),)
                             next_visited_mask = visited_mask | (1 << i) | (1 << idx)
-                            
+
                             heapq.heappush(
                                 big_heapqueue,
                                 (prio_mod, [next_whole_cycle, next_visited_mask]),
@@ -252,7 +251,6 @@ def main(scrambled, solution):
                     prio_mod = next_priority + priority_adjust.get(
                         len(next_whole_cycle[-1]), 0
                     )
-                    
 
                     heapq.heappush(
                         big_heapqueue, (prio_mod, [next_whole_cycle, next_visited_mask])
@@ -272,22 +270,21 @@ def main(scrambled, solution):
                     scrambled_list[cycle[i]],
                 )
         print("Swaps: ", swapcount)
-        '''if solution != scrambled_list:
+        """if solution != scrambled_list:
             print("ERROR: Solution does not match!")
             input()
             print("Expected solution:", solution)
             print("Computed solution:", scrambled_list)
         elif solution == scrambled_list:
-            print("SUCCESS: Solution matches!")'''
+            print("SUCCESS: Solution matches!")"""
         break
-
 
     end_time = time.time()
     total_runtime = end_time - start_time
     print(f"Total optimal path finding routine runtime: {total_runtime:.2f} seconds")
     print(" ")
 
-    #return total_heap_pops
+    # return total_heap_pops
 
 
 # scrambled = "DBDFAFECBCAE"
