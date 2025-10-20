@@ -17,7 +17,8 @@ import json
 # so the new cycles are [0,9],[9,6] and [0,9],[9,28]
 # if the next index points to the beginning, we store it and start a new cycle
 # this continues until every index has been visited
-# the idea is that the more cycles we have, the shorter the path, because the best cycle is one that solves two positions in one move
+# the idea is that the more cycles we have, the shorter the path,
+# because the best cycle is one that solves two positions in one move
 # Simplified Example:
 # to transform dbaca into aabcd
 # you could swap [[0,2],[2,1],[1,4]] (one cycle with 3 swaps, each move solving 1 position)
@@ -129,7 +130,6 @@ def main(scrambled, solution):
     unvisited_list = []
     unsolved_tiles = 0
     visited_mask = 0
-    total_heap_pops = 0
     # how many tiles to solve?
     for i in range(solution_length):
         if scrambled[i] != solution[i]:
@@ -181,6 +181,7 @@ def main(scrambled, solution):
                 next_whole_cycle = doubles + (local_cycle,)
                 # giving -20000 priority for each double swap and
                 # treat the next cycle as if it were a double swap too
+                # to ensure they're on top of the heapqueue
                 priority = (len(doubles) * -20000) - 20000
                 heapq.heappush(
                     big_heapqueue, (priority, [next_whole_cycle, next_visited_mask])
@@ -191,10 +192,6 @@ def main(scrambled, solution):
         # print("Current Heap Size:", len(big_heapqueue))
         priority, heap_item = heapq.heappop(big_heapqueue)
         whole_cycle, visited_mask = heap_item
-        # print(visited_mask)
-        # print("Heap Size:", len(big_heapqueue))
-        push_batch = []
-        total_heap_pops += 1
 
         # we visited everything so we must be done
         if bin(visited_mask).count("1") == solution_length:
@@ -215,7 +212,7 @@ def main(scrambled, solution):
         for index in next_possible_indices:
             # case 1: end of cycle points to start, finish and open a new one
             if index == local_cycle[0]:
-                # make hashable sets to avoid visiting the same cycle twice
+                # make hashable sets to avoid visiting cycles creating the same permutation twice
                 whole_frozen = frozenset(whole_cycle)
                 if whole_frozen in cyclopedia:
                     continue
@@ -229,10 +226,8 @@ def main(scrambled, solution):
                             visited_mask & (1 << i)
                         ):
                             next_priority = priority
-                            # magic values!
                             # since we're adding a new cycle we're assigning a high priority to the
                             # next cycle to ensure it'll be on top of the heapqueue
-
                             prio_mod = next_priority - 20000
                             next_whole_cycle = whole_cycle + ((i, idx),)
                             next_visited_mask = visited_mask | (1 << i) | (1 << idx)
@@ -247,6 +242,13 @@ def main(scrambled, solution):
                     next_priority = priority
                     next_whole_cycle = whole_cycle[:-1] + (local_cycle + (index,),)
                     next_visited_mask = visited_mask | (1 << index)
+                    # more magic values. if the last cycle was size 2 it had a priority of -20000
+                    # we know it will now be size 3 so want to set it to -1000, so we modify it with +20000 -1000 = +19000
+                    # same for size 4: +1000 -100 = +900, and so on
+                    # there might be a better way to set priority but this has worked best so far.
+                    # we can't simply prioritize by number of cycles because this can be misleading
+                    # as there are situations where there might exist a cycle with length 3
+                    # but it's not part of the optimal solution
                     priority_adjust = {3: 19000, 4: 900, 5: 90, 6: 9, 7: 1}
                     prio_mod = next_priority + priority_adjust.get(
                         len(next_whole_cycle[-1]), 0
@@ -257,6 +259,7 @@ def main(scrambled, solution):
                     )
 
     # verify solution
+    # enable for debugging
     """for item in solutionstack:
         scrambled_list = list(scrambled)
         swapcount = 0
@@ -283,8 +286,6 @@ def main(scrambled, solution):
     # total_runtime = end_time - start_time
     # print(f"Total optimal path finding routine runtime: {total_runtime:.2f} seconds")
     print(" ")
-
-    # return total_heap_pops
 
 
 # scrambled = "DBDFAFECBCAE"
@@ -313,5 +314,4 @@ if __name__ == "__main__":
     end_time = time.time()
     total_runtime = end_time - start_time
 
-    # Print the total runtime
     print(f"Total runtime: {total_runtime:.2f} seconds for {puzzle_count} puzzles")
