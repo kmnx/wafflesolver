@@ -230,28 +230,32 @@ def main(scrambled, solution):
                         if not (visited_mask & (1 << idx)) and not (
                             visited_mask & (1 << i)
                         ):
-                            next_priority = priority
                             # since we're adding a new cycle we're assigning a high priority
                             # to ensure it'll be on top of the heapqueue
-                            prio_mod = next_priority - 20000
+                            
+                            next_priority = priority - 20000
                             next_whole_cycle = whole_cycle + ((i, idx),)
                             next_visited_mask = visited_mask | (1 << i) | (1 << idx)
+                            
 
                             heapq.heappush(
                                 big_heapqueue,
-                                (prio_mod, [next_whole_cycle, next_visited_mask]),
+                                (next_priority, [next_whole_cycle, next_visited_mask]),
                             )
             # case 2: end of cycle points to an unvisited index, so continue the cycle
             else:
                 if not (visited_mask & (1 << index)):
-                    next_priority = priority
-                    next_whole_cycle = whole_cycle[:-1] + (local_cycle + (index,),)
-                    next_visited_mask = visited_mask | (1 << index)
                     # we already assigned high priority per cycle start,
                     # so the longer a cycle gets, the less priority it has
-                    prio_mod = next_priority + 1000
+                    next_priority = priority + 1000
+                    # extend the current cycle
+                    # slice off the last cycle collection and add the local cycle with the new index
+                    next_whole_cycle = whole_cycle[:-1] + (local_cycle + (index,),)
+                    # update binary visited mask
+                    next_visited_mask = visited_mask | (1 << index)
+                    
                     heapq.heappush(
-                        big_heapqueue, (prio_mod, [next_whole_cycle, next_visited_mask])
+                        big_heapqueue, (next_priority, [next_whole_cycle, next_visited_mask])
                     )
 
     # verify solution
