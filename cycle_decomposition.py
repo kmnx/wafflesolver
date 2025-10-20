@@ -231,8 +231,8 @@ def main(scrambled, solution):
                             visited_mask & (1 << i)
                         ):
                             next_priority = priority
-                            # since we're adding a new cycle we're assigning a high priority to the
-                            # next cycle to ensure it'll be on top of the heapqueue
+                            # since we're adding a new cycle we're assigning a high priority
+                            # to ensure it'll be on top of the heapqueue
                             prio_mod = next_priority - 20000
                             next_whole_cycle = whole_cycle + ((i, idx),)
                             next_visited_mask = visited_mask | (1 << i) | (1 << idx)
@@ -247,18 +247,9 @@ def main(scrambled, solution):
                     next_priority = priority
                     next_whole_cycle = whole_cycle[:-1] + (local_cycle + (index,),)
                     next_visited_mask = visited_mask | (1 << index)
-                    # more magic values. if the last cycle was size 2 it had a priority of -20000
-                    # we know it will now be size 3 so want to set it to -1000, so we modify it with +20000 -1000 = +19000
-                    # same for size 4: +1000 -100 = +900, and so on
-                    # there might be a better way to set priority but this has worked best so far.
-                    # we can't simply prioritize by number of cycles because this can be misleading
-                    # as there are situations where there might exist a cycle with length 3
-                    # but it's not part of the optimal solution
-                    priority_adjust = {3: 19000, 4: 900, 5: 90, 6: 9, 7: 1}
-                    prio_mod = next_priority + priority_adjust.get(
-                        len(next_whole_cycle[-1]), 0
-                    )
-
+                    # we already assigned high priority per cycle start,
+                    # so the longer a cycle gets, the less priority it has
+                    prio_mod = next_priority + 1000
                     heapq.heappush(
                         big_heapqueue, (prio_mod, [next_whole_cycle, next_visited_mask])
                     )
