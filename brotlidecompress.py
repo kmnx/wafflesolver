@@ -9,17 +9,17 @@ start_time = time.time()
 
 # Helper to load the puzzles from wafflegame.com
 
-with open("archive-waffle5-brotli-2024-11-07.json") as f:
+with open("archive-27fddeb9.json") as f:
     content5 = json.load(f)
-with open("archive-waffle7-brotli-2024-11-07.json") as f:
+with open("archive-63f7eed4.json") as f:
     content7 = json.load(f)
 
 
 def main():
     archive_list = []
-    with open("archive-waffle5-brotli-2024-11-07.json") as f:
+    with open("archive-27fddeb9.json") as f:
         content5 = json.load(f)
-    with open("archive-waffle7-brotli-2024-11-07.json") as f:
+    with open("archive-63f7eed4.json") as f:
         content7 = json.load(f)
     for key, b64string in content5.items():
         compressed_data = base64.b64decode(b64string)

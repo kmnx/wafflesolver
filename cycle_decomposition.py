@@ -212,7 +212,10 @@ def main(scrambled, solution):
         for index in next_possible_indices:
             # case 1: end of cycle points to start, finish and open a new one
             if index == local_cycle[0]:
-                # make hashable sets to avoid visiting cycles creating the same permutation twice
+                # make hashable sets to avoid visiting cycles that would represent the same permutation
+                # for example the cycles (1,3,2,4), (3,2,4,1), (2,4,1,3) and (4,1,3,2) all create the same outcome.
+                # ABCD with (1,3,2,4): CBAD -> CABD -> CDBA
+                # ABCD with (2,4,1,3): ADCB -> BDCA -> CDBA
                 whole_frozen = frozenset(whole_cycle)
                 if whole_frozen in cyclopedia:
                     continue
@@ -221,7 +224,9 @@ def main(scrambled, solution):
 
                 # new cycle lets go
                 for i in unvisited_list:
+                    # look up all the next possible indices
                     for idx in mapping[scrambled[i]]:
+                        # check that neither have been visited in our binary visited_mask
                         if not (visited_mask & (1 << idx)) and not (
                             visited_mask & (1 << i)
                         ):
@@ -236,7 +241,7 @@ def main(scrambled, solution):
                                 big_heapqueue,
                                 (prio_mod, [next_whole_cycle, next_visited_mask]),
                             )
-            # case 2: end of cycle points to an unvisited index, continue the cycle
+            # case 2: end of cycle points to an unvisited index, so continue the cycle
             else:
                 if not (visited_mask & (1 << index)):
                     next_priority = priority
