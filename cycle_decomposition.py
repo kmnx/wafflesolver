@@ -1,4 +1,3 @@
-import copy
 import heapq
 import time
 import json
@@ -41,15 +40,10 @@ def solution_mapping(scrambled, solution, solved_at_start):
 
 
 # helper to make the solution swaps human readable
-def convert_indices_to_xy(cycle):
+def convert_indices_to_xy(cycle, max_moves):
     all_moves = []
-    n = 0
-    for item in cycle:
-        n += len(item)
-    n = n - len(cycle)
-    print(n)
-    if n == 10:
-        indexmap = {
+    if max_moves == 10:
+        index_map = {
             0: "1,1",
             1: "1,2",
             2: "1,3",
@@ -72,8 +66,8 @@ def convert_indices_to_xy(cycle):
             19: "5,4",
             20: "5,5",
         }
-    elif n == 20:
-        indexmap = {
+    elif max_moves == 20:
+        index_map = {
             0: "1,1",
             1: "1,2",
             2: "1,3",
@@ -115,163 +109,157 @@ def convert_indices_to_xy(cycle):
             38: "7,6",
             39: "7,7",
         }
-    else:
-        print("something is wrong, ideal move number is off")
-        input()
+
     for item in cycle:
         item = item[::-1]  # reverse tuple
         for l, index in enumerate(item):
-            all_moves.append([indexmap[index], indexmap[item[l + 1]]])
+            all_moves.append([index_map[index], index_map[item[l + 1]]])
             if l == len(item) - 2:
                 break
     print(all_moves)
 
 
 def main(scrambled, solution):
+    priority = 0
     scrambled = [c for c in scrambled if c != " "]
     solution = [c for c in solution if c != " "]
     start_time = time.time()
     cyclopedia = set()
     solutionstack = []
     big_heapqueue = []
-    visitedlist = []
-    unvisitedlist = []
+    visited_list = tuple()
+    unvisited_list = []
     unsolved_tiles = 0
     # weed out already solved positions
-    for i in range(len(scrambled)):
-        if scrambled[i] == solution[i]:
-            visitedlist.append(i)
-    unvisitedlist = [i for i in range(len(scrambled)) if i not in visitedlist]
+    visited_list = tuple(
+        i for i in range(len(scrambled)) if scrambled[i] == solution[i]
+    )
+    unvisited_list = [i for i in range(len(scrambled)) if i not in visited_list]
+
     # how many tiles to solve?
     for i in range(len(scrambled)):
         if scrambled[i] != solution[i]:
             unsolved_tiles += 1
+
     # lenght of solution is either 40 or 21. 49 and 25 are the lengths if spaces are included
     if len(solution) in [40, 49]:
-        success = 20
+        max_moves = 20
     elif len(solution) in [21, 25]:
-        success = 10
+        max_moves = 10
+
     # To know when a perfect solution is found we need to know the number of required cycles.
     # If a 5x5 waffle has 14 unsolved tiles and can be solved in 10 moves
     # then 10 moves to solve 14 tiles means 4 double swaps (8 solved) and 6 single swaps (6 solved)
     # 14 - 10 = 4 double swaps = 4 cycles because each cycle ends with a double swap
-    ideal_cycles_number = unsolved_tiles - success
+    ideal_cycles_number = unsolved_tiles - max_moves
 
     # map characters to possible solution positions so we can look them up faster
-    mapping = solution_mapping(scrambled, solution, visitedlist)
+    mapping = solution_mapping(scrambled, solution, visited_list)
 
-    # generate starting swaps
-    for i in unvisitedlist:
+    # first pass to find all double swaps
+    doubles = tuple()
+    start_rem = set()
+    for i in unvisited_list:
+        for index in mapping[scrambled[i]]:
+            if (index not in visited_list) and (i not in visited_list):
+                if scrambled[i] == solution[index] and scrambled[index] == solution[i]:
+                    doubles += ((i, index),)
+                    visited_list += (i, index)
+                    start_rem.add(i)
+                    start_rem.add(index)
+    for i in start_rem:
+        unvisited_list.remove(i)
+
+    # second pass to generate starting swaps
+    for i in unvisited_list:
         # go over the map to find indices to create the next possible swaps
         for index in mapping[scrambled[i]]:
-            next_visitedlist = visitedlist.copy()
-            #localcycle = [i, index]
-            localcycle = (i, index)
-            newwholecycle = [localcycle]
-            priority = 0
-            priority -= 2 * 10000
-            next_visitedlist.append(i)
-            next_visitedlist.append(index)
-            heapq.heappush(
-                big_heapqueue, (priority, [newwholecycle, next_visitedlist])
-            )
+            if (index not in visited_list) and (i not in visited_list):
+                next_visited_list = visited_list + (i, index)
+                local_cycle = (i, index)
+                next_whole_cycle = doubles + (local_cycle,)
+                priority = (len(doubles) * -20000) - 20000
+                # print("Initial Priority:", priority)
+                heapq.heappush(
+                    big_heapqueue, (priority, [next_whole_cycle, next_visited_list])
+                )
 
     # try generating cycles as long as there are still any on the heapqueue
     while big_heapqueue:
-        #print("Heapqueue size:", len(big_heapqueue))
         priority, heap_item = heapq.heappop(big_heapqueue)
-        wholecycle, visitedlist = heap_item
+        whole_cycle, visited_list = heap_item
 
         # we visited everything so we must be done
-        if len(visitedlist) == len(solution):
+        if len(visited_list) == len(solution):
 
             # for the wafflegame.com we already know the number of ideal cycles
-            if len(wholecycle) == ideal_cycles_number:
-                solutionstack.append(wholecycle)
+            if len(whole_cycle) == ideal_cycles_number:
+                solutionstack.append(whole_cycle)
                 print("Optimal solution:")
-                print(wholecycle)
-                convert_indices_to_xy(wholecycle)
+                print(whole_cycle)
+                convert_indices_to_xy(whole_cycle, max_moves)
                 break
 
             continue
 
-        localcycle = wholecycle[-1]
+        local_cycle = whole_cycle[-1]
         # lookup next required character positions
-        next_possible_indices = mapping[scrambled[localcycle[-1]]]
+        next_possible_indices = mapping[scrambled[local_cycle[-1]]]
         for index in next_possible_indices:
             # case 1: end of cycle points to start, finish and open a new one
-            if index == localcycle[0]:
+            if index == local_cycle[0]:
                 # make hashable sets to avoid visiting the same cycle twice
-                whole_frozen = frozenset(wholecycle)
+                whole_frozen = frozenset(whole_cycle)
                 if whole_frozen in cyclopedia:
                     continue
                 else:
                     cyclopedia.add(whole_frozen)
-                # new cycle lets go
-                #nextlocalcycle = []
-                for i in range(len(scrambled)):
-                    for index in mapping[scrambled[i]]:
-                        if (index not in visitedlist) and (i not in visitedlist):
-                            # new cycle so copy the current one and add the next
-                            newwholecycle = wholecycle.copy()
-                            #nextlocalcycle = (i, index)
-                            #newwholecycle.append(nextlocalcycle)
-                            newlocalcycle = (i, index)
-                            newwholecycle.append(newlocalcycle)
-                            priority = 0
-                            next_visitedlist = visitedlist.copy()
-                            next_visitedlist.append(i)
-                            next_visitedlist.append(index)
 
+                # new cycle lets go
+                for i in unvisited_list:
+                    for index in mapping[scrambled[i]]:
+                        if (index not in visited_list) and (i not in visited_list):
+                            next_priority = priority
                             # magic values!
-                            # 2-cycles are the most valuable ones and get lowest priority
-                            # priority determines the order in which the cycles are popped from the heapqueue
-                            for cycle in newwholecycle:
-                                if len(cycle) == 2:
-                                    priority -= 2 * 10000
-                                if len(cycle) == 3:
-                                    priority -= 1000
-                                elif len(cycle) == 4:
-                                    priority -= 100
-                                elif len(cycle) == 5:
-                                    priority -= 10
-                                elif len(cycle) == 6:
-                                    priority -= 1
-                            
+                            # since we're adding a new cycle we're assigning a high priority to the
+                            # next cycle to ensure it'll be on top of the heapqueue
+
+                            prio_mod = next_priority - 20000
+                            next_whole_cycle = whole_cycle + ((i, index),)
+                            next_visited_list = visited_list + (i, index)
+
                             # und hepp!
                             heapq.heappush(
                                 big_heapqueue,
-                                (priority, [newwholecycle, next_visitedlist]),
-                        )
+                                (prio_mod, [next_whole_cycle, next_visited_list]),
+                            )
+            # case 2: end of cycle points to an unvisited index, continue the cycle
             else:
-                # next index still not visited, add it to the current cycle
-                if index not in visitedlist:
-                    newwholecycle = wholecycle.copy()
-                    #newwholecycle[-1].append(index) 
-                    newwholecycle[-1] = localcycle + (index,)
-                    next_visitedlist = visitedlist.copy()
-                    next_visitedlist.append(index)
-                    priority = 0
-                    for cycle in newwholecycle:
-                        if len(cycle) == 2:
-                            priority -= 2 * 10000
-                        elif len(cycle) == 3:
-                            priority -= 1000
-                        elif len(cycle) == 4:
-                            priority -= 100
-                        elif len(cycle) == 5:
-                            priority -= 10
-                        elif len(cycle) == 6:
-                            priority -= 1
-                    
+                if index not in visited_list:
+                    next_priority = priority
+                    next_whole_cycle = whole_cycle[:-1] + (local_cycle + (index,),)
+                    next_visited_list = visited_list + (index,)
+                    # seems to work now
+                    if len(next_whole_cycle[-1]) == 3:
+                        prio_mod = next_priority + 20000 - 1000
+                    elif len(next_whole_cycle[-1]) == 4:
+                        prio_mod = next_priority + 1000 - 100
+                    elif len(next_whole_cycle[-1]) == 5:
+                        prio_mod = next_priority + 100 - 10
+                    elif len(next_whole_cycle[-1]) == 6:
+                        prio_mod = next_priority + 10 - 1
+                    elif len(next_whole_cycle[-1]) == 7:
+                        prio_mod = next_priority + 1
+                    else:
+                        prio_mod = next_priority
+
                     heapq.heappush(
-                        big_heapqueue, (priority, [newwholecycle, next_visitedlist])
+                        big_heapqueue, (prio_mod, [next_whole_cycle, next_visited_list])
                     )
 
     # verify solution
-    '''
     for item in solutionstack:
-        scrambled_list = copy.deepcopy(list(scrambled))
+        scrambled_list = list(scrambled)
         swapcount = 0
         for cycle in item:
             swapcount += len(cycle) - 1
@@ -283,18 +271,15 @@ def main(scrambled, solution):
                     scrambled_list[cycle[i]],
                 )
         print("Swaps: ", swapcount)
-        print("Expected solution:", "".join(solution))
-        print("Computed solution:", "".join(scrambled_list))
+        if solution != scrambled_list:
+            print("ERROR: Solution does not match!")
+            input()
+            print("Expected solution:", solution)
+            print("Computed solution:", scrambled_list)
         break
-    '''
 
-    # Record the end time
     end_time = time.time()
-
-    # Calculate the total runtime
     total_runtime = end_time - start_time
-
-    # Print the total runtime
     print(f"Total optimal path finding routine runtime: {total_runtime:.2f} seconds")
     print(" ")
 
