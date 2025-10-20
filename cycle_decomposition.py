@@ -123,6 +123,7 @@ def main(scrambled, solution):
     priority = 0
     scrambled = [c for c in scrambled if c != " "]
     solution = [c for c in solution if c != " "]
+    solution_length = len(solution)
     start_time = time.time()
     cyclopedia = set()
     solutionstack = []
@@ -130,16 +131,17 @@ def main(scrambled, solution):
     unvisited_list = []
     unsolved_tiles = 0
     visited_mask = 0
+    total_heap_pops = 0
     # how many tiles to solve?
     for i in range(len(scrambled)):
         if scrambled[i] != solution[i]:
             unsolved_tiles += 1
         else:
-            visited_mask |= (1 << i)
+            visited_mask |= 1 << i
     unvisited_list = [i for i in range(len(scrambled)) if not (visited_mask & (1 << i))]
-    if len(solution) in [40, 49]:
+    if solution_length in [40, 49]:
         max_moves = 20
-    elif len(solution) in [21, 25]:
+    elif solution_length in [21, 25]:
         max_moves = 10
 
     # To know when a perfect solution is found we need to know the number of required cycles.
@@ -149,7 +151,11 @@ def main(scrambled, solution):
     ideal_cycles_number = unsolved_tiles - max_moves
 
     # map characters to possible solution positions so we can look them up faster
-    mapping = solution_mapping(scrambled, solution, [i for i in range(len(scrambled)) if (visited_mask & (1 << i))])
+    mapping = solution_mapping(
+        scrambled,
+        solution,
+        [i for i in range(solution_length) if (visited_mask & (1 << i))],
+    )
 
     # first pass to find all double swaps
     doubles = tuple()
@@ -185,10 +191,13 @@ def main(scrambled, solution):
         # print("Current Heap Size:", len(big_heapqueue))
         priority, heap_item = heapq.heappop(big_heapqueue)
         whole_cycle, visited_mask = heap_item
-        print(visited_mask)
+        #print(visited_mask)
+        #print("Heap Size:", len(big_heapqueue))
+        push_batch = []
+        total_heap_pops += 1
 
         # we visited everything so we must be done
-        if bin(visited_mask).count('1') == len(solution):
+        if bin(visited_mask).count("1") == solution_length:
 
             # for the wafflegame.com we already know the number of ideal cycles
             if len(whole_cycle) == ideal_cycles_number:
@@ -197,6 +206,7 @@ def main(scrambled, solution):
                 print(whole_cycle)
                 convert_indices_to_xy(whole_cycle, max_moves)
                 break
+                
 
             continue
 
@@ -216,7 +226,9 @@ def main(scrambled, solution):
                 # new cycle lets go
                 for i in unvisited_list:
                     for idx in mapping[scrambled[i]]:
-                        if not (visited_mask & (1 << idx)) and not (visited_mask & (1 << i)):
+                        if not (visited_mask & (1 << idx)) and not (
+                            visited_mask & (1 << i)
+                        ):
                             next_priority = priority
                             # magic values!
                             # since we're adding a new cycle we're assigning a high priority to the
@@ -225,6 +237,7 @@ def main(scrambled, solution):
                             prio_mod = next_priority - 20000
                             next_whole_cycle = whole_cycle + ((i, idx),)
                             next_visited_mask = visited_mask | (1 << i) | (1 << idx)
+                            
                             heapq.heappush(
                                 big_heapqueue,
                                 (prio_mod, [next_whole_cycle, next_visited_mask]),
@@ -236,7 +249,11 @@ def main(scrambled, solution):
                     next_whole_cycle = whole_cycle[:-1] + (local_cycle + (index,),)
                     next_visited_mask = visited_mask | (1 << index)
                     priority_adjust = {3: 19000, 4: 900, 5: 90, 6: 9, 7: 1}
-                    prio_mod = next_priority + priority_adjust.get(len(next_whole_cycle[-1]), 0)
+                    prio_mod = next_priority + priority_adjust.get(
+                        len(next_whole_cycle[-1]), 0
+                    )
+                    
+
                     heapq.heappush(
                         big_heapqueue, (prio_mod, [next_whole_cycle, next_visited_mask])
                     )
@@ -255,19 +272,22 @@ def main(scrambled, solution):
                     scrambled_list[cycle[i]],
                 )
         print("Swaps: ", swapcount)
-        if solution != scrambled_list:
+        '''if solution != scrambled_list:
             print("ERROR: Solution does not match!")
             input()
             print("Expected solution:", solution)
             print("Computed solution:", scrambled_list)
         elif solution == scrambled_list:
-            print("SUCCESS: Solution matches!")
+            print("SUCCESS: Solution matches!")'''
         break
+
 
     end_time = time.time()
     total_runtime = end_time - start_time
     print(f"Total optimal path finding routine runtime: {total_runtime:.2f} seconds")
     print(" ")
+
+    #return total_heap_pops
 
 
 # scrambled = "DBDFAFECBCAE"
