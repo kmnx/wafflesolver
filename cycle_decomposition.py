@@ -111,11 +111,9 @@ def convert_indices_to_xy(cycle, max_moves):
         }
 
     for item in cycle:
-        item = item[::-1]  # reverse tuple
-        for l, index in enumerate(item):
-            all_moves.append([index_map[index], index_map[item[l + 1]]])
-            if l == len(item) - 2:
-                break
+        item = item[::-1]  # reverse tuple if needed
+        move = [index_map[index] for index in item]
+        all_moves.append(move)
     print(all_moves)
 
 
@@ -133,12 +131,14 @@ def main(scrambled, solution):
     visited_mask = 0
     total_heap_pops = 0
     # how many tiles to solve?
-    for i in range(len(scrambled)):
+    for i in range(solution_length):
         if scrambled[i] != solution[i]:
             unsolved_tiles += 1
         else:
             visited_mask |= 1 << i
-    unvisited_list = [i for i in range(len(scrambled)) if not (visited_mask & (1 << i))]
+    unvisited_list = [
+        i for i in range(solution_length) if not (visited_mask & (1 << i))
+    ]
     if solution_length in [40, 49]:
         max_moves = 20
     elif solution_length in [21, 25]:
@@ -203,7 +203,7 @@ def main(scrambled, solution):
             if len(whole_cycle) == ideal_cycles_number:
                 solutionstack.append(whole_cycle)
                 print("Optimal solution:")
-                print(whole_cycle)
+                # print(whole_cycle)
                 convert_indices_to_xy(whole_cycle, max_moves)
                 break
 
@@ -257,7 +257,7 @@ def main(scrambled, solution):
                     )
 
     # verify solution
-    for item in solutionstack:
+    """for item in solutionstack:
         scrambled_list = list(scrambled)
         swapcount = 0
         for cycle in item:
@@ -270,18 +270,18 @@ def main(scrambled, solution):
                     scrambled_list[cycle[i]],
                 )
         print("Swaps: ", swapcount)
-        """if solution != scrambled_list:
+        if solution != scrambled_list:
             print("ERROR: Solution does not match!")
             input()
             print("Expected solution:", solution)
             print("Computed solution:", scrambled_list)
         elif solution == scrambled_list:
-            print("SUCCESS: Solution matches!")"""
-        break
+            print("SUCCESS: Solution matches!")
+        break"""
 
-    end_time = time.time()
-    total_runtime = end_time - start_time
-    print(f"Total optimal path finding routine runtime: {total_runtime:.2f} seconds")
+    # end_time = time.time()
+    # total_runtime = end_time - start_time
+    # print(f"Total optimal path finding routine runtime: {total_runtime:.2f} seconds")
     print(" ")
 
     # return total_heap_pops
