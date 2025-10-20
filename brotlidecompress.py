@@ -7,7 +7,7 @@ import cycle_decomposition
 start_time = time.time()
 
 
-# just a helper to load the puzzles from wafflegame.com
+# Helper to load the puzzles from wafflegame.com
 
 with open("archive-waffle5-brotli-2024-11-07.json") as f:
     content5 = json.load(f)

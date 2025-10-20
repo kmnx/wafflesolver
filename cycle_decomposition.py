@@ -130,7 +130,7 @@ def main(scrambled, solution):
     visited_list = tuple()
     unvisited_list = []
     unsolved_tiles = 0
-    # weed out already solved positions
+    # remove already solved positions
     visited_list = tuple(
         i for i in range(len(scrambled)) if scrambled[i] == solution[i]
     )
@@ -178,6 +178,8 @@ def main(scrambled, solution):
                 next_visited_list = visited_list + (i, index)
                 local_cycle = (i, index)
                 next_whole_cycle = doubles + (local_cycle,)
+                # giving -20000 priority for each double swap and
+                # treat the next cycle as if it were a double swap too
                 priority = (len(doubles) * -20000) - 20000
                 # print("Initial Priority:", priority)
                 heapq.heappush(
@@ -186,6 +188,8 @@ def main(scrambled, solution):
 
     # try generating cycles as long as there are still any on the heapqueue
     while big_heapqueue:
+        # print("Current Heap Size:", len(big_heapqueue))
+        # print("len visited:", len(visited_list))
         priority, heap_item = heapq.heappop(big_heapqueue)
         whole_cycle, visited_list = heap_item
 
@@ -239,17 +243,17 @@ def main(scrambled, solution):
                     next_priority = priority
                     next_whole_cycle = whole_cycle[:-1] + (local_cycle + (index,),)
                     next_visited_list = visited_list + (index,)
-                    # seems to work now
+                    # we're extending the last cycle and have to adjust priority accordingly
                     if len(next_whole_cycle[-1]) == 3:
-                        prio_mod = next_priority + 20000 - 1000
+                        prio_mod = next_priority + 19000  # +20000 - 1000
                     elif len(next_whole_cycle[-1]) == 4:
-                        prio_mod = next_priority + 1000 - 100
+                        prio_mod = next_priority + 900  # +1000 - 100
                     elif len(next_whole_cycle[-1]) == 5:
-                        prio_mod = next_priority + 100 - 10
+                        prio_mod = next_priority + 90  # +100 - 10
                     elif len(next_whole_cycle[-1]) == 6:
-                        prio_mod = next_priority + 10 - 1
+                        prio_mod = next_priority + 9  # +10 - 1
                     elif len(next_whole_cycle[-1]) == 7:
-                        prio_mod = next_priority + 1
+                        prio_mod = next_priority + 1  # +1 - 0
                     else:
                         prio_mod = next_priority
 
@@ -302,11 +306,13 @@ if __name__ == "__main__":
         archive_list = json.load(f)
     # archive_list = brotlidecompress.main()
     start_time = time.time()
+    puzzle_count = 0
     for item in archive_list:
+        puzzle_count += 1
         print(item)
         main(item[0], item[1])
     end_time = time.time()
     total_runtime = end_time - start_time
 
     # Print the total runtime
-    print(f"Total runtime: {total_runtime:.2f} seconds")
+    print(f"Total runtime: {total_runtime:.2f} seconds for {puzzle_count} puzzles")
