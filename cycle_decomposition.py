@@ -127,21 +127,16 @@ def main(scrambled, solution):
     cyclopedia = set()
     solutionstack = []
     big_heapqueue = []
-    visited_list = tuple()
     unvisited_list = []
     unsolved_tiles = 0
-    # remove already solved positions
-    visited_list = tuple(
-        i for i in range(len(scrambled)) if scrambled[i] == solution[i]
-    )
-    unvisited_list = [i for i in range(len(scrambled)) if i not in visited_list]
-
+    visited_mask = 0
     # how many tiles to solve?
     for i in range(len(scrambled)):
         if scrambled[i] != solution[i]:
             unsolved_tiles += 1
-
-    # lenght of solution is either 40 or 21. 49 and 25 are the lengths if spaces are included
+        else:
+            visited_mask |= (1 << i)
+    unvisited_list = [i for i in range(len(scrambled)) if not (visited_mask & (1 << i))]
     if len(solution) in [40, 49]:
         max_moves = 20
     elif len(solution) in [21, 25]:
@@ -154,17 +149,17 @@ def main(scrambled, solution):
     ideal_cycles_number = unsolved_tiles - max_moves
 
     # map characters to possible solution positions so we can look them up faster
-    mapping = solution_mapping(scrambled, solution, visited_list)
+    mapping = solution_mapping(scrambled, solution, [i for i in range(len(scrambled)) if (visited_mask & (1 << i))])
 
     # first pass to find all double swaps
     doubles = tuple()
     start_rem = set()
     for i in unvisited_list:
         for index in mapping[scrambled[i]]:
-            if (index not in visited_list) and (i not in visited_list):
+            if not (visited_mask & (1 << index)) and not (visited_mask & (1 << i)):
                 if scrambled[i] == solution[index] and scrambled[index] == solution[i]:
                     doubles += ((i, index),)
-                    visited_list += (i, index)
+                    visited_mask |= (1 << i) | (1 << index)
                     start_rem.add(i)
                     start_rem.add(index)
     for i in start_rem:
@@ -174,27 +169,26 @@ def main(scrambled, solution):
     for i in unvisited_list:
         # go over the map to find indices to create the next possible swaps
         for index in mapping[scrambled[i]]:
-            if (index not in visited_list) and (i not in visited_list):
-                next_visited_list = visited_list + (i, index)
+            if not (visited_mask & (1 << index)) and not (visited_mask & (1 << i)):
+                next_visited_mask = visited_mask | (1 << i) | (1 << index)
                 local_cycle = (i, index)
                 next_whole_cycle = doubles + (local_cycle,)
                 # giving -20000 priority for each double swap and
                 # treat the next cycle as if it were a double swap too
                 priority = (len(doubles) * -20000) - 20000
-                # print("Initial Priority:", priority)
                 heapq.heappush(
-                    big_heapqueue, (priority, [next_whole_cycle, next_visited_list])
+                    big_heapqueue, (priority, [next_whole_cycle, next_visited_mask])
                 )
 
     # try generating cycles as long as there are still any on the heapqueue
     while big_heapqueue:
         # print("Current Heap Size:", len(big_heapqueue))
-        # print("len visited:", len(visited_list))
         priority, heap_item = heapq.heappop(big_heapqueue)
-        whole_cycle, visited_list = heap_item
+        whole_cycle, visited_mask = heap_item
+        print(visited_mask)
 
         # we visited everything so we must be done
-        if len(visited_list) == len(solution):
+        if bin(visited_mask).count('1') == len(solution):
 
             # for the wafflegame.com we already know the number of ideal cycles
             if len(whole_cycle) == ideal_cycles_number:
@@ -221,44 +215,30 @@ def main(scrambled, solution):
 
                 # new cycle lets go
                 for i in unvisited_list:
-                    for index in mapping[scrambled[i]]:
-                        if (index not in visited_list) and (i not in visited_list):
+                    for idx in mapping[scrambled[i]]:
+                        if not (visited_mask & (1 << idx)) and not (visited_mask & (1 << i)):
                             next_priority = priority
                             # magic values!
                             # since we're adding a new cycle we're assigning a high priority to the
                             # next cycle to ensure it'll be on top of the heapqueue
 
                             prio_mod = next_priority - 20000
-                            next_whole_cycle = whole_cycle + ((i, index),)
-                            next_visited_list = visited_list + (i, index)
-
-                            # und hepp!
+                            next_whole_cycle = whole_cycle + ((i, idx),)
+                            next_visited_mask = visited_mask | (1 << i) | (1 << idx)
                             heapq.heappush(
                                 big_heapqueue,
-                                (prio_mod, [next_whole_cycle, next_visited_list]),
+                                (prio_mod, [next_whole_cycle, next_visited_mask]),
                             )
             # case 2: end of cycle points to an unvisited index, continue the cycle
             else:
-                if index not in visited_list:
+                if not (visited_mask & (1 << index)):
                     next_priority = priority
                     next_whole_cycle = whole_cycle[:-1] + (local_cycle + (index,),)
-                    next_visited_list = visited_list + (index,)
-                    # we're extending the last cycle and have to adjust priority accordingly
-                    if len(next_whole_cycle[-1]) == 3:
-                        prio_mod = next_priority + 19000  # +20000 - 1000
-                    elif len(next_whole_cycle[-1]) == 4:
-                        prio_mod = next_priority + 900  # +1000 - 100
-                    elif len(next_whole_cycle[-1]) == 5:
-                        prio_mod = next_priority + 90  # +100 - 10
-                    elif len(next_whole_cycle[-1]) == 6:
-                        prio_mod = next_priority + 9  # +10 - 1
-                    elif len(next_whole_cycle[-1]) == 7:
-                        prio_mod = next_priority + 1  # +1 - 0
-                    else:
-                        prio_mod = next_priority
-
+                    next_visited_mask = visited_mask | (1 << index)
+                    priority_adjust = {3: 19000, 4: 900, 5: 90, 6: 9, 7: 1}
+                    prio_mod = next_priority + priority_adjust.get(len(next_whole_cycle[-1]), 0)
                     heapq.heappush(
-                        big_heapqueue, (prio_mod, [next_whole_cycle, next_visited_list])
+                        big_heapqueue, (prio_mod, [next_whole_cycle, next_visited_mask])
                     )
 
     # verify solution
@@ -280,6 +260,8 @@ def main(scrambled, solution):
             input()
             print("Expected solution:", solution)
             print("Computed solution:", scrambled_list)
+        elif solution == scrambled_list:
+            print("SUCCESS: Solution matches!")
         break
 
     end_time = time.time()
