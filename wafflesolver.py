@@ -101,7 +101,17 @@ def recursive_solve(
             waffle_skeleton[i][j] = prev
 
     return None  # no solution found at this branch
-
+def wordlist_slimmer(wordlist_unfiltered, all_chars, n):
+    # simple first naive wordlist filtering against available characters
+    wordlist = []
+    for w in wordlist_unfiltered:
+        for i in range(n):
+            if w[i] not in all_chars:
+                break
+            else:
+                if i == n - 1:
+                    wordlist.append(w)
+    return wordlist
 
 def solve(waffle, wordlist_unfiltered):
     # Set up the skeleton waffle with only the green letters
@@ -126,6 +136,8 @@ def solve(waffle, wordlist_unfiltered):
         simplified_array.append(simplified_row)
     n = len(waffle[0])
     # simple first naive wordlist filtering against available characters
+    
+    #wordlist_unfiltered = wordlist_slimmer(wordlist_unfiltered, all_chars, n)
     wordlist = []
     for w in wordlist_unfiltered:
         for i in range(n):
@@ -147,8 +159,8 @@ def solve(waffle, wordlist_unfiltered):
                 continue
             else:
                 # we assume every remaining character is possible at a free space, then slim it down
-                temp_possible_chars_vert = deepcopy(rem_chars_set)
-                temp_possible_chars_hori = deepcopy(rem_chars_set)
+                temp_possible_chars_vert = (rem_chars_set).copy()
+                temp_possible_chars_hori = (rem_chars_set).copy()
                 # if current position is yellow, remove
                 if waffle[i][j][1] == "y":
                     if waffle[i][j][0] in temp_possible_chars_hori:
@@ -316,13 +328,11 @@ if __name__ == "__main__":
 
     solutions_file = os.path.join(cwd, "wordlist_5.txt")
     with open(solutions_file) as file:
-        wordlist_unfiltered_5 = set(line.strip() for line in file)
-    wordlist_unfiltered_5 = [w.lower() for w in wordlist_unfiltered_5]
+        wordlist_unfiltered_5 = [line.strip().lower() for line in file]
 
     solutions_file = os.path.join(cwd, "wordlist_7.txt")
     with open(solutions_file) as file:
-        wordlist_unfiltered_7 = set(line.strip() for line in file)
-    wordlist_unfiltered_7 = [w.lower() for w in wordlist_unfiltered_7]
+        wordlist_unfiltered_7 = [line.strip().lower() for line in file]
 
     # wafflestates are in wafflestate.py
     main(wafflestate.initial_state_five_1)

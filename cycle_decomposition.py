@@ -128,12 +128,12 @@ def main(scrambled, solution):
     solutionstack = []
     big_heapqueue = []
     unvisited_list = []
-    unsolved_tiles = 0
     visited_mask = 0
+    unsolved_tiles_counter = 0
     # how many tiles to solve?
     for i in range(solution_length):
         if scrambled[i] != solution[i]:
-            unsolved_tiles += 1
+            unsolved_tiles_counter += 1
         else:
             visited_mask |= 1 << i
     unvisited_list = [
@@ -143,12 +143,12 @@ def main(scrambled, solution):
         max_moves = 20
     elif solution_length in [21, 25]:
         max_moves = 10
-
+    remaining_moves = max_moves
     # To know when a perfect solution is found we need to know the number of required cycles.
     # If a 5x5 waffle has 14 unsolved tiles and can be solved in 10 moves
     # then 10 moves to solve 14 tiles means 4 double swaps (8 solved) and 6 single swaps (6 solved)
     # 14 - 10 = 4 double swaps = 4 cycles because each cycle ends with a double swap
-    ideal_cycles_number = unsolved_tiles - max_moves
+    ideal_cycles_number = unsolved_tiles_counter - max_moves
 
     # map characters to possible solution positions so we can look them up faster
     mapping = solution_mapping(
@@ -168,6 +168,8 @@ def main(scrambled, solution):
                     visited_mask |= (1 << i) | (1 << index)
                     start_rem.add(i)
                     start_rem.add(index)
+                    unsolved_tiles_counter -=2
+                    remaining_moves = remaining_moves - 1
     for i in start_rem:
         unvisited_list.remove(i)
 
@@ -179,19 +181,21 @@ def main(scrambled, solution):
                 next_visited_mask = visited_mask | (1 << i) | (1 << index)
                 local_cycle = (i, index)
                 next_whole_cycle = doubles + (local_cycle,)
+                next_unsolved_counter = unsolved_tiles_counter - 1
+                next_remaining_moves = remaining_moves - 1
                 # giving -20000 priority for each double swap and
                 # treat the next cycle as if it were a double swap too
                 # to ensure they're on top of the heapqueue
                 priority = (len(doubles) * -20000) - 20000
                 heapq.heappush(
-                    big_heapqueue, (priority, [next_whole_cycle, next_visited_mask])
+                    big_heapqueue, (priority, [next_whole_cycle, next_visited_mask, next_unsolved_counter, next_remaining_moves])
                 )
 
     # try generating cycles as long as there are still any on the heapqueue
     while big_heapqueue:
         # print("Current Heap Size:", len(big_heapqueue))
         priority, heap_item = heapq.heappop(big_heapqueue)
-        whole_cycle, visited_mask = heap_item
+        whole_cycle, visited_mask, unsolved_tiles_counter, remaining_moves = heap_item
 
         # we visited everything so we must be done
         if bin(visited_mask).count("1") == solution_length:
@@ -223,6 +227,37 @@ def main(scrambled, solution):
                     cyclopedia.add(whole_frozen)
 
                 # new cycle lets go
+
+                # shortcut for the final cycle: if we are currently at optimal_cycles_number - 1
+                # and have exactly enough moves left to solve all remaining tiles
+                # we can just create the final cycle directly
+                if len(whole_cycle) == ideal_cycles_number - 1:
+                    # calculate the the moves we have remaining (max_moves - (solved_counter))
+                    # if that's equal to the number of unsolved tiles, we can create the final cycle directly
+                    # simply by taking the next possible index, adding it to the final cycle, look up the next
+                    # possible indices until all are visited
+
+                    if remaining_moves == unsolved_tiles_counter - 2:
+
+                        start_idx = next(i for i in unvisited_list if not (visited_mask & (1 << i)))
+                        final_cycle = [start_idx]
+                        current_idx = start_idx
+                        final_visited_mask = visited_mask | (1 << start_idx)
+                        for _ in range(unsolved_tiles_counter - 1):
+                            next_indices = [idx for idx in mapping[scrambled[current_idx]] if not (final_visited_mask & (1 << idx))]
+                            if not next_indices:
+                                break
+                            next_idx = next_indices[0]
+                            final_cycle.append(next_idx)
+                            final_visited_mask |= (1 << next_idx)
+                            current_idx = next_idx
+                        next_whole_cycle = whole_cycle + (tuple(final_cycle),)
+                        solutionstack.append(next_whole_cycle)
+                        print("Optimal solution:")
+                        convert_indices_to_xy(next_whole_cycle, max_moves)
+                        big_heapqueue = []
+                        break
+                
                 for i in unvisited_list:
                     # look up all the next possible indices
                     for idx in mapping[scrambled[i]]:
@@ -236,11 +271,12 @@ def main(scrambled, solution):
                             next_priority = priority - 20000
                             next_whole_cycle = whole_cycle + ((i, idx),)
                             next_visited_mask = visited_mask | (1 << i) | (1 << idx)
-                            
+                            next_unsolved_counter = unsolved_tiles_counter - 2
+                            next_remaining_moves = remaining_moves - 1
 
                             heapq.heappush(
                                 big_heapqueue,
-                                (next_priority, [next_whole_cycle, next_visited_mask]),
+                                (next_priority, [next_whole_cycle, next_visited_mask, next_unsolved_counter, next_remaining_moves]),
                             )
             # case 2: end of cycle points to an unvisited index, so continue the cycle
             else:
@@ -253,14 +289,17 @@ def main(scrambled, solution):
                     next_whole_cycle = whole_cycle[:-1] + (local_cycle + (index,),)
                     # update binary visited mask
                     next_visited_mask = visited_mask | (1 << index)
+                    next_unsolved_counter = unsolved_tiles_counter - 1
+                    next_remaining_moves = remaining_moves - 1
+                    # maybe add the shortcut here too?
                     
                     heapq.heappush(
-                        big_heapqueue, (next_priority, [next_whole_cycle, next_visited_mask])
+                        big_heapqueue, (next_priority, [next_whole_cycle, next_visited_mask, next_unsolved_counter, next_remaining_moves])
                     )
 
     # verify solution
     # enable for debugging
-    """for item in solutionstack:
+    '''for item in solutionstack:
         scrambled_list = list(scrambled)
         swapcount = 0
         for cycle in item:
@@ -280,7 +319,7 @@ def main(scrambled, solution):
             print("Computed solution:", scrambled_list)
         elif solution == scrambled_list:
             print("SUCCESS: Solution matches!")
-        break"""
+        break'''
 
     # end_time = time.time()
     # total_runtime = end_time - start_time
